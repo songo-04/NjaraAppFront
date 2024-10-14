@@ -19,7 +19,7 @@ class Calendar extends StatefulWidget {
 class _CalendarState extends State<Calendar> {
   bool _isLoading = false;
   List<DelimitationModel> _delimitationList = [];
-  final FlutterSecureStorage storage = FlutterSecureStorage();
+  final FlutterSecureStorage storage = const FlutterSecureStorage();
   final Logger log = Logger();
   late DateTime _focusedDay;
   late DateTime _selectedDay;
@@ -85,7 +85,7 @@ class _CalendarState extends State<Calendar> {
       }
       _events[dateKey]!.add(delimitation);
     }
-    setState(() {}); // Déclencher une reconstruction du widget
+    setState(() {});
   }
 
   @override
