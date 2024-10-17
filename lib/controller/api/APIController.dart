@@ -5,6 +5,7 @@ import 'package:appfront/constant/link.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 class APIController {
   FlutterSecureStorage storage = const FlutterSecureStorage();
   Logger log = Logger();
@@ -24,5 +25,11 @@ class APIController {
     }else{
       return false;
     }
+  }
+  
+  Future<String> getUserId() async {
+    String? token = await storage.read(key: 'token');
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
+    return decodedToken['userId'];
   }
 }

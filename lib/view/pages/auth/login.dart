@@ -8,6 +8,7 @@ import 'package:appfront/view/pages/auth/singUp.dart';
 import 'package:appfront/view/pages/home/tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:appfront/utils/spinkit.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -53,7 +54,7 @@ class _LoginState extends State<Login> {
                     });
                   }),
                   charge
-                      ? const CircularProgressIndicator()
+                      ? fadingCircle
                       : _btn(() async {
                           if (_globalKey.currentState!.validate()) {
                             setState(() {
@@ -88,13 +89,13 @@ class _LoginState extends State<Login> {
                               charge = false;
                               _showDialog(context, outPut['res']);
                             }
-                            charge=false;
+                            charge = false;
                           }
                         }, 'Login', bgColor, mainColor),
-                  const Text('or'),
+                  const Text('or', style: TextStyle(color: textColorSecondary)),
                   _btn(() {
                     navigation(context, const SignUp());
-                  }, 'Sign up', inversColor, inversColor2),
+                  }, 'Sign up', textColor, cardColor),
                 ],
               ),
             )
@@ -129,76 +130,117 @@ class _LoginState extends State<Login> {
 
 Widget _inputUserName(TextEditingController controller) {
   return Padding(
-    padding: const EdgeInsets.only(right: 24, left: 24, top: 20),
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
     child: TextFormField(
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Email is empty';
+          return 'Email is required';
+        }
+        // Add email format validation
+        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+          return 'Entrez une adresse email valide';
         }
         return null;
       },
       controller: controller,
+      keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         border: OutlineInputBorder(
-            borderSide: BorderSide.none,
-            borderRadius: BorderRadius.circular(8)),
-        hintText: 'User email',
+          borderSide: const BorderSide(color: textColor),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: textColorSecondary),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: mainColor, width: 2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        hintText: 'Entrer votre email',
+        hintStyle: const TextStyle(color: textColorSecondary),
+        labelText: 'Email',
+        labelStyle: const TextStyle(color: textColorSecondary),
         filled: true,
-        fillColor: inversColor2,
-        suffixIconColor: bgColor,
+        fillColor: cardColor,
+        prefixIcon: const Icon(Icons.email, color: textColorSecondary),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
+      style: const TextStyle(fontSize: 16, color: textColor),
     ),
   );
 }
 
 Widget _inputPassword(bool vis, TextEditingController controller, fun) {
   return Padding(
-    padding: const EdgeInsets.only(right: 24, left: 24, top: 20),
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
     child: TextFormField(
       obscureText: vis,
       validator: (value) {
-        if (value!.isEmpty) {
-          return 'Password is empty';
+        if (value == null || value.isEmpty) {
+          return 'Password is required';
         }
+        // Add password strength validation if needed
         return null;
       },
       controller: controller,
       decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderSide: const BorderSide(color: textColorSecondary),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: textColorSecondary),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: mainColor, width: 2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        hintText: 'Entrer votre mot de passe',
+        hintStyle: const TextStyle(color: textColorSecondary),
+        labelText: 'Mot de passe',
+        labelStyle: const TextStyle(color: textColorSecondary),
+        filled: true,
+        fillColor: cardColor,
+        prefixIcon: const Icon(Icons.lock, color: textColorSecondary),
         suffixIcon: IconButton(
-          color: inversColor,
+          color: textColorSecondary,
           onPressed: fun,
           icon: Icon(vis ? Icons.visibility_off : Icons.visibility),
         ),
-        border: OutlineInputBorder(
-            borderSide: BorderSide.none,
-            borderRadius: BorderRadius.circular(8)),
-        hintText: 'Password',
-        filled: true,
-        fillColor: inversColor2,
-        suffixIconColor: bgColor,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
+      style: const TextStyle(fontSize: 16, color: textColor),
     ),
   );
 }
 
-Widget _btn(fun, String txt, Color txtColor, Color bgColor) {
-  return GestureDetector(
-    onTap: fun,
-    child: Container(
+Widget _btn(VoidCallback fun, String txt, Color txtColor, Color bgColor) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+    child: SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: bgColor,
-      ),
-      child: Center(
+      child: ElevatedButton(
+        onPressed: fun,
+        style: ElevatedButton.styleFrom(
+          foregroundColor: txtColor,
+          backgroundColor: bgColor,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 2,
+        ),
         child: Text(
           txt,
           style: TextStyle(
             color: txtColor,
             fontSize: 16,
             fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
           ),
         ),
       ),

@@ -8,6 +8,7 @@ import 'package:logger/logger.dart';
 import 'package:appfront/constant/link.dart';
 import 'dart:convert';
 import 'package:appfront/model/work/delimitation.dart';
+import 'package:appfront/utils/spinkit.dart';
 
 class DelimitationStory extends StatefulWidget {
   const DelimitationStory({super.key});
@@ -34,7 +35,7 @@ class _DelimitationStoryState extends State<DelimitationStory> {
     try {
       final token = await storage.read(key: 'token');
       final response = await http.get(
-        Uri.parse('${urlApi}delimitation'),
+        Uri.parse('${urlApi}work/delimitation'),
         headers: {"Authorization": token ?? ''},
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -60,7 +61,7 @@ class _DelimitationStoryState extends State<DelimitationStory> {
         children: [
           Expanded(
             child: (charge)
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(child: fadingCircle)
                 : ListView.builder(
                     itemCount: _delimitationList.length,
                     itemBuilder: (context, index) {

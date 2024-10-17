@@ -1,7 +1,7 @@
-import 'package:appfront/constant/color.dart';
 import 'package:flutter/material.dart';
 import 'afficheContact.dart';
 import 'createContactPage.dart';
+import 'package:appfront/constant/color.dart';
 
 class Contact extends StatefulWidget {
   const Contact({super.key});
@@ -11,71 +11,37 @@ class Contact extends StatefulWidget {
 }
 
 class _ContactState extends State<Contact> {
-  final List<Widget> pages = [
-    const AfficheContact(),
-    const ContactCreatePage(),
-  ];
-  int index = 0;
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: Colors.white,
+      color: bgColor,
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            width: double.infinity,
+            height: 50,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                _contactBtn(index == 0, Colors.blue, 'Contact', () {
-                  setState(() {
-                    index = 0;
-                  });
-                }),
-                _contactBtn(index == 1, Colors.blue, 'Add', () {
-                  setState(() {
-                    index = 1;
-                  });
-                }),
+                IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ContactCreatePage()));
+                    },
+                    icon: const Icon(Icons.add, color: textColor))
               ],
             ),
           ),
-          Expanded(child: pages[index]),
+          const Expanded(
+            child: AfficheContact(),
+          ),
         ],
       ),
     );
   }
-}
-
-Widget _contactBtn(
-    bool isSelected, Color color, String text, Function() onTap) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      decoration: BoxDecoration(
-        color: isSelected ? mainColor : Colors.grey,
-        borderRadius: BorderRadius.circular(50),
-      ),
-      child: Center(
-        child: Text(
-          text,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    ),
-  );
 }

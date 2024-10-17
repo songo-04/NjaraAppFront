@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:appfront/constant/color.dart';
 import 'package:appfront/controller/auth/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:appfront/utils/spinkit.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -45,22 +46,32 @@ class _ProfileState extends State<Profile> {
         backgroundColor: Colors.white,
         title: const Text(
           'Profile',
-          style: TextStyle(fontSize: 18),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+        elevation: 0,
       ),
       body: charge
-          ?  const Center(child: CircularProgressIndicator())
-          : Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(color: bgColor),
-              child: Column(
-                children: [
-                  _avatar(name[0]),
-                  _text(name),
-                  _text(email),
-                ],
+          ? Center(child: fadingCircle)
+          : SafeArea(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 20),
+                        _avatar(name.isNotEmpty ? name[0] : ''),
+                        const SizedBox(height: 16),
+                        _text(name),
+                        const SizedBox(height: 8),
+                        _text(email),
+                        // Add more profile information or actions here
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
     );
@@ -79,14 +90,31 @@ class _ProfileState extends State<Profile> {
 
   Widget _avatar(String txt) {
     return Container(
-      width: 80,
-      height: 80,
+      width: 100, // Increased size for better visibility
+      height: 100,
       decoration: BoxDecoration(
-          color: inversColor2, borderRadius: BorderRadius.circular(100)),
+        color: cardColor,
+        shape: BoxShape
+            .circle, // Use shape instead of borderRadius for perfect circle
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
       child: Center(
         child: Text(
-          txt.toUpperCase(),
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          txt.isNotEmpty
+              ? txt[0].toUpperCase()
+              : '?', // Handle empty string case
+          style: const TextStyle(
+            fontSize: 36, // Increased font size
+            fontWeight: FontWeight.bold,
+            color: Colors.white, // Improved contrast
+          ),
         ),
       ),
     );

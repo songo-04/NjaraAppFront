@@ -9,7 +9,7 @@ class Auth {
   //String baseUrl = 'https://njarapi-1owhtq2y.b4a.run/njarapi/user/';
 
   Logger log = Logger();
-  final  _storage = const FlutterSecureStorage();
+  final _storage = const FlutterSecureStorage();
   Future<http.Response> login(Map<String, String> body) async {
     var request = await http.post(
       Uri.parse('${urlApi}user/signin'),
@@ -20,9 +20,9 @@ class Auth {
   }
 
   Future<dynamic> signup(Map<String, String> body) async {
-    String url = 'signup';
+    
     var request = await http.post(
-      Uri.parse(baseUrl + url),
+      Uri.parse('${urlApi}user/signup'),
       headers: {"Content-type": "application/json"},
       body: json.encode(body),
     );

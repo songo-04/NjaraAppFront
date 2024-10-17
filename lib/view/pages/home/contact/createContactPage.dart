@@ -2,6 +2,8 @@
 
 import 'package:appfront/constant/color.dart';
 import 'package:appfront/controller/api/APIController.dart';
+import 'package:appfront/utils/appBar.dart';
+import 'package:appfront/utils/spinkit.dart';
 import 'package:flutter/material.dart';
 
 class ContactCreatePage extends StatefulWidget {
@@ -25,44 +27,58 @@ class _ContactCreatePageState extends State<ContactCreatePage> {
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      color: Colors.white,
-      child: Form(
-        key: _globalKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _input(contact_name, 'contact name', TextInputType.text),
-            _input(contact_number, 'contact number', TextInputType.number),
-            _input(contact_email, 'contact email', TextInputType.emailAddress),
-            _input(contact_note, 'contact note', TextInputType.text),
-            charge
-                ? const CircularProgressIndicator()
-                : _btn(
-                    () async {
-                      if (_globalKey.currentState!.validate()) {
-                        setState(() {
-                          charge = true;
-                        });
-                        Map<String, String> data = {
-                          'contact_name': contact_name.text,
-                          'contact_number': contact_number.text,
-                          'contact_email': contact_email.text,
-                          'contact_note': contact_note.text,
-                        };
-                        debugPrint(data.toString());
-                        await contact.create(data,'contact');
-                        setState(() {
-                          charge = false;
-                        });
-                      }
-                    },
-                  )
-          ],
+    return Scaffold(
+      appBar: const AppBarUtils(title: 'Ajouter un contact'),
+      body: Container(
+        width: double.infinity,
+        color: bgColor,
+        child: Form(
+          key: _globalKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _input(contact_name, 'contact name', TextInputType.text),
+              _input(contact_number, 'contact number', TextInputType.number),
+              _input(
+                  contact_email, 'contact email', TextInputType.emailAddress),
+              _input(contact_note, 'contact note', TextInputType.text),
+              charge
+                  ? fadingCircle
+                  : _btn(
+                      () async {
+                        if (contact_name.text.isEmpty ||
+                            contact_number.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content:
+                                    Text('nom et numero sont obligatoires')),
+                          );
+                          return;
+                        }
+                        if (_globalKey.currentState!.validate()) {
+                          setState(() {
+                            charge = true;
+                          });
+                          Map<String, String> data = {
+                            'contact_name': contact_name.text,
+                            'contact_number': contact_number.text,
+                            'contact_email': contact_email.text,
+                            'contact_note': contact_note.text,
+                          };
+                          debugPrint(data.toString());
+                          await contact.create(data, 'contact');
+                          setState(() {
+                            charge = false;
+                          });
+                        }
+                      },
+                    )
+            ],
+          ),
         ),
       ),
     );
@@ -88,13 +104,13 @@ class _ContactCreatePageState extends State<ContactCreatePage> {
           ),
           hintText: hintText,
           filled: true,
-          fillColor: inversColor2,
+          fillColor: cardColor,
         ),
       ),
     );
   }
 
-  _btn(fun) {
+  _btn(VoidCallback fun) {
     return GestureDetector(
       onTap: fun,
       child: Container(
@@ -108,8 +124,9 @@ class _ContactCreatePageState extends State<ContactCreatePage> {
             color: mainColor, borderRadius: BorderRadius.circular(8)),
         child: const Center(
           child: Text(
-            'Create',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            'Enregistrer',
+            style: TextStyle(
+                color: bgColor, fontSize: 16, fontWeight: FontWeight.w500),
           ),
         ),
       ),

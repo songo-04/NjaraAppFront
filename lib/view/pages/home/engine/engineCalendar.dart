@@ -1,9 +1,10 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, collection_methods_unrelated_type
 
 import 'package:appfront/model/engine/engineReservation.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class EngineCalendarPage extends StatefulWidget {
   const EngineCalendarPage({super.key});
@@ -27,12 +28,8 @@ class _EngineCalendarPageState extends State<EngineCalendarPage> {
     return _events[day] ?? [];
   }
 
-  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    setState(() {
-      _selectedDay = selectedDay;
-      _focusedDay = focusedDay;
-    });
-  }
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   void _addEvent() {
     final eventTitle = _eventController.text;
@@ -68,7 +65,121 @@ class _EngineCalendarPageState extends State<EngineCalendarPage> {
         const EngineReservation(reservation_name: 'reservation appareil 2')
       ],
     };
+
+    // _initializeNotifications();
+    // _scheduleAlarm();
   }
+
+  // Future<void> _initializeNotifications() async {
+  //   tz.initializeTimeZones();
+  //   const AndroidInitializationSettings initializationSettingsAndroid =
+  //       AndroidInitializationSettings('@mipmap/ic_launcher');
+  //   final DarwinInitializationSettings initializationSettingsDarwin =
+  //       DarwinInitializationSettings(
+  //     requestAlertPermission: true,
+  //     requestBadgePermission: true,
+  //     requestSoundPermission: true,
+  //   );
+  //   final InitializationSettings initializationSettings = InitializationSettings(
+  //     android: initializationSettingsAndroid,
+  //     iOS: initializationSettingsDarwin,
+  //   );
+  //   await flutterLocalNotificationsPlugin.initialize(
+  //     initializationSettings,
+  //     onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) {
+  //       // Handle the notification response here
+  //       log.i('Notification clicked');
+  //       _handleNotificationResponse(notificationResponse);
+  //     },
+  //   );
+
+  //   // Demandez les permissions
+  //   await flutterLocalNotificationsPlugin
+  //       .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+  //       ?.requestNotificationsPermission();
+  //   await flutterLocalNotificationsPlugin
+  //       .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+  //       ?.requestPermissions(
+  //         alert: true,
+  //         badge: true,
+  //         sound: true,
+  //       );
+  // }
+
+  // void _handleNotificationResponse(NotificationResponse notificationResponse) {
+  //   final String? payload = notificationResponse.payload;
+  //   if (payload != null) {
+  //     log.i('Notification payload: $payload');
+  //     // Parse the payload and navigate to the appropriate screen or perform an action
+  //     _navigateToRelevantScreen(payload);
+  //   }
+
+  //   // Update the UI or perform any other necessary actions
+  //   setState(() {
+  //     // For example, you could refresh the calendar or mark a specific day
+  //     _focusedDay = DateTime.now();
+  //     _selectedDay = DateTime.now();
+  //   });
+  // }
+
+  // void _navigateToRelevantScreen(String payload) {
+  //   // Implement navigation logic based on the payload
+  //   // For example:
+  //   switch (payload) {
+  //     case 'daily_reminder':
+  //       // Navigate to daily summary screen
+  //       // Navigator.push(context, MaterialPageRoute(builder: (context) => DailySummaryScreen()));
+  //       break;
+  //     case 'upcoming_reservation':
+  //       // Navigate to reservation details screen
+  //       // Navigator.push(context, MaterialPageRoute(builder: (context) => ReservationDetailsScreen()));
+  //       break;
+  //     default:
+  //       // Default action or error handling
+  //       log.w('Unknown payload: $payload');
+  //   }
+  // }
+
+  // Future<void> _scheduleAlarm() async {
+  //   final now = DateTime.now();
+  //   final alarmTime = DateTime(now.year, now.month, now.day, 17, 55);
+
+  //   if (now.isBefore(alarmTime)) {
+  //     await _scheduleNotification(alarmTime);
+  //   } else {
+  //     // If it's already past 19:00, schedule for tomorrow
+  //     final tomorrowAlarm = alarmTime.add(const Duration(days: 1));
+  //     await _scheduleNotification(tomorrowAlarm);
+  //   }
+  // }
+
+  // Future<void> _scheduleNotification(DateTime scheduledDate) async {
+  //   var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+  //     'alarm_channel',
+  //     'Alarm Notifications',
+  //     importance: Importance.max,
+  //     priority: Priority.high,
+  //     showWhen: true,
+  //   );
+  //   var iOSPlatformChannelSpecifics = const DarwinNotificationDetails();
+  //   var platformChannelSpecifics = NotificationDetails(
+  //     android: androidPlatformChannelSpecifics,
+  //     iOS: iOSPlatformChannelSpecifics,
+  //   );
+
+  //   await flutterLocalNotificationsPlugin.zonedSchedule(
+  //     0,
+  //     'Alarme',
+  //     'Il est 19h00!',
+  //     tz.TZDateTime.from(scheduledDate, tz.local),
+  //     platformChannelSpecifics,
+  //     androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+  //     uiLocalNotificationDateInterpretation:
+  //         UILocalNotificationDateInterpretation.absoluteTime,
+  //     matchDateTimeComponents: DateTimeComponents.time,
+  //     payload: 'daily_reminder',
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +236,4 @@ class _EngineCalendarPageState extends State<EngineCalendarPage> {
       ],
     );
   }
-  
 }
-

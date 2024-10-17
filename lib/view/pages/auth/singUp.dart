@@ -43,9 +43,12 @@ class _SignUpState extends State<SignUp> {
               key: _globalKey,
               child: Column(
                 children: [
-                  _input('User name', _userNameController),
-                  _input('Email', _userEmailController),
-                  _input('Password', _userPasswordController),
+                  _input('User name', _userNameController, icon: Icons.person),
+                  _input('Email', _userEmailController,
+                      keyboardType: TextInputType.emailAddress,
+                      icon: Icons.email),
+                  _input('Password', _userPasswordController,
+                      isPassword: true, icon: Icons.lock),
                   charge
                       ? const CircularProgressIndicator()
                       : _btn(() {
@@ -66,10 +69,10 @@ class _SignUpState extends State<SignUp> {
                             navigation(context, const Login());
                           }
                         }, 'Sign Up', bgColor, mainColor),
-                  const Text('or'),
+                  const Text('or', style: TextStyle(color: textColorSecondary)),
                   _btn(() {
                     navigation(context, const Login());
-                  }, 'Login', inversColor, inversColor2),
+                  }, 'Login', textColor, cardColor),
                 ],
               ),
             )
@@ -80,11 +83,19 @@ class _SignUpState extends State<SignUp> {
   }
 }
 
-Widget _input(String hintText, TextEditingController controller) {
+Widget _input(
+  String hintText,
+  TextEditingController controller, {
+  bool isPassword = false,
+  TextInputType keyboardType = TextInputType.text,
+  IconData? icon,
+}) {
   return Padding(
     padding: const EdgeInsets.only(right: 24, left: 24, top: 20),
     child: TextFormField(
       controller: controller,
+      obscureText: isPassword,
+      keyboardType: keyboardType,
       validator: (value) {
         if (value!.isEmpty) {
           return '$hintText is empty';
@@ -93,36 +104,55 @@ Widget _input(String hintText, TextEditingController controller) {
       },
       decoration: InputDecoration(
         border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: textColor),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: textColorSecondary),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: mainColor, width: 2),
+          borderRadius: BorderRadius.circular(12),
         ),
         hintText: hintText,
+        hintStyle: const TextStyle(color: textColorSecondary),
+        labelText: hintText,
+        labelStyle: const TextStyle(color: textColorSecondary),
         filled: true,
-        fillColor: inversColor2,
-        suffixIconColor: inversColor,
+        fillColor: cardColor,
+        prefixIcon: icon != null ? Icon(icon, color: textColorSecondary) : null,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
+      style: const TextStyle(fontSize: 16, color: textColor),
     ),
   );
 }
 
-Widget _btn(fun, String txt, Color txtColor, Color bgColor) {
-  return InkWell(
-    onTap: fun,
-    child: Container(
+Widget _btn(VoidCallback fun, String txt, Color txtColor, Color bgColor) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+    child: SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: bgColor,
-      ),
-      child: Center(
+      child: ElevatedButton(
+        onPressed: fun,
+        style: ElevatedButton.styleFrom(
+          foregroundColor: txtColor,
+          backgroundColor: bgColor,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 2,
+        ),
         child: Text(
           txt,
           style: TextStyle(
             color: txtColor,
             fontSize: 16,
             fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
           ),
         ),
       ),

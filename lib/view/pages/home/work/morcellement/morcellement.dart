@@ -1,33 +1,34 @@
 import 'dart:convert';
 import 'package:appfront/constant/color.dart';
 import 'package:appfront/constant/link.dart';
-import 'package:appfront/model/work/delimitation.dart';
+import 'package:appfront/model/work/morcellement.dart';
 import 'package:appfront/utils/spinkit.dart';
-import 'package:appfront/view/pages/home/work/delimitation/addDelimitation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
-import 'package:http/http.dart' as http;
 import 'package:table_calendar/table_calendar.dart';
+import 'addMorcellement.dart';
+import 'package:http/http.dart' as http;
 import 'package:appfront/utils/voirPlus.dart';
 
-class Delimitation extends StatefulWidget {
-  const Delimitation({super.key});
+class MorcellementPage extends StatefulWidget {
+  const MorcellementPage({super.key});
 
   @override
-  State<Delimitation> createState() => _DelimitationState();
+  State<MorcellementPage> createState() => _MorcellementState();
 }
 
-class _DelimitationState extends State<Delimitation> {
+class _MorcellementState extends State<MorcellementPage> {
   bool _isLoading = false;
   bool _isCalendar = true;
-  List<DelimitationModel> _delimitationList = [];
+
+  List<Morcellement> _morcellementList = [];
   final FlutterSecureStorage storage = const FlutterSecureStorage();
   final Logger log = Logger();
   late DateTime _focusedDay;
   late DateTime _selectedDay;
-  late Map<DateTime, List<DelimitationModel>> _events;
+  late Map<DateTime, List<Morcellement>> _events;
 
   @override
   void initState() {
@@ -35,10 +36,10 @@ class _DelimitationState extends State<Delimitation> {
     _focusedDay = DateTime.now();
     _selectedDay = _focusedDay;
     _events = {};
-    _fetchDelimitation();
+    _fetchMorcellement();
   }
 
-  List<DelimitationModel> _getEventsForDay(DateTime day) {
+  List<Morcellement> _getEventsForDay(DateTime day) {
     return _events[DateTime(day.year, day.month, day.day)] ?? [];
   }
 
@@ -51,45 +52,45 @@ class _DelimitationState extends State<Delimitation> {
     }
   }
 
-  Future<void> _fetchDelimitation() async {
+  Future<void> _fetchMorcellement() async {
     setState(() {
       _isLoading = true;
     });
     try {
       final token = await storage.read(key: 'token');
       final response = await http.get(
-        Uri.parse('${urlApi}work/delimitation'),
+        Uri.parse('${urlApi}work/morcellement'),
         headers: {"Authorization": token ?? ''},
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         log.i(response.body);
         final List<dynamic> datas = json.decode(response.body);
         setState(() {
-          _delimitationList =
-              datas.map((data) => DelimitationModel.fromJson(data)).toList();
-          _loadDelimitation();
+          _morcellementList =
+              datas.map((data) => Morcellement.fromJson(data)).toList();
+          _loadMorcellement();
           _isLoading = false;
         });
       } else {
-        throw Exception('Failed to load delimitations: ${response.statusCode}');
+        throw Exception('Failed to load morcellement: ${response.statusCode}');
       }
     } catch (e) {
-      log.e('Error fetching delimitation: $e');
+      log.e('Error fetching morcellement: $e');
       setState(() {
         _isLoading = false;
       });
     }
   }
 
-  void _loadDelimitation() {
+  void _loadMorcellement() {
     _events = {};
-    for (var delimitation in _delimitationList) {
-      final date = DateTime.parse(delimitation.createdAt).toLocal();
+    for (var morcellement in _morcellementList) {
+      final date = DateTime.parse(morcellement.date_reception).toLocal();
       final dateKey = DateTime(date.year, date.month, date.day);
       if (_events[dateKey] == null) {
         _events[dateKey] = [];
       }
-      _events[dateKey]!.add(delimitation);
+      _events[dateKey]!.add(morcellement);
     }
     setState(() {});
   }
@@ -106,6 +107,7 @@ class _DelimitationState extends State<Delimitation> {
             width: double.infinity,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 IconButton(
                     onPressed: () {
@@ -117,13 +119,14 @@ class _DelimitationState extends State<Delimitation> {
                       _isCalendar ? Icons.calendar_month : Icons.list,
                       color: textColor,
                     )),
-                const Text('Delimitation', style: TextStyle(color: textColor)),
+                const Text('Morcellement', style: TextStyle(color: textColor)),
                 IconButton(
                   onPressed: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const AddDelimitation()));
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AddMorcellement()),
+                    );
                   },
                   icon: const Icon(
                     Icons.add,
@@ -142,7 +145,7 @@ class _DelimitationState extends State<Delimitation> {
   Widget _calendar() {
     return Column(
       children: [
-        TableCalendar<DelimitationModel>(
+        TableCalendar<Morcellement>(
           firstDay: DateTime.now().subtract(const Duration(days: 365)),
           lastDay: DateTime.now().add(const Duration(days: 365)),
           focusedDay: _focusedDay,
@@ -205,9 +208,9 @@ class _DelimitationState extends State<Delimitation> {
             },
           ),
           daysOfWeekHeight: 20,
-          daysOfWeekStyle: const DaysOfWeekStyle(
-            weekdayStyle: TextStyle(color: textColor),
-            weekendStyle: TextStyle(color: textColor),
+          daysOfWeekStyle: DaysOfWeekStyle(
+            dowTextFormatter: (date, locale) =>
+                DateFormat.E(locale).format(date)[0],
           ),
           headerStyle: const HeaderStyle(
             formatButtonVisible: false,
@@ -232,11 +235,11 @@ class _DelimitationState extends State<Delimitation> {
                           ),
                           const SizedBox(height: 16),
                           const Text(
-                            'Aucune delimitation',
+                            'Aucun morcellement',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: textColorSecondary,
+                              color: textColor,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -244,7 +247,7 @@ class _DelimitationState extends State<Delimitation> {
                             'pour le ${DateFormat('d MMMM yyyy').format(_selectedDay)}',
                             style: const TextStyle(
                               fontSize: 16,
-                              color: textColor,
+                              color: textColorSecondary,
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -254,7 +257,7 @@ class _DelimitationState extends State<Delimitation> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                        const AddDelimitation()),
+                                        const AddMorcellement()),
                               );
                             },
                             icon: const Icon(
@@ -262,7 +265,7 @@ class _DelimitationState extends State<Delimitation> {
                               color: bgColor,
                             ),
                             label: const Text(
-                              'Ajouter une delimitation',
+                              'Ajouter un morcellement',
                               style: TextStyle(color: bgColor),
                             ),
                             style: ElevatedButton.styleFrom(
@@ -276,51 +279,8 @@ class _DelimitationState extends State<Delimitation> {
                     )
                   : ListView(
                       children: _getEventsForDay(_selectedDay)
-                          .map((delimitation) => Card(
-                                color: cardColor,
-                                elevation: 2,
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 16),
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.all(16),
-                                  leading: CircleAvatar(
-                                    backgroundColor: mainColor,
-                                    child: Text(
-                                      delimitation.name_topographe[0]
-                                          .toUpperCase(),
-                                      style: const TextStyle(color: textColor),
-                                    ),
-                                  ),
-                                  title: Text(
-                                    delimitation.name_topographe,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Propriétaire: ${delimitation.proprietaire}',
-                                        style: const TextStyle(
-                                            color: textColorSecondary),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        'Contact: ${delimitation.contact_topographe}',
-                                        style:
-                                            TextStyle(color: Colors.grey[600]),
-                                      ),
-                                    ],
-                                  ),
-                                  trailing: const Icon(Icons.arrow_forward_ios,
-                                      color: mainColor),
-                                  onTap: () {},
-                                ),
-                              ))
+                          .map((morcellement) =>
+                              MorcellementListItem(morcellement: morcellement))
                           .toList(),
                     ),
         ),
@@ -329,71 +289,63 @@ class _DelimitationState extends State<Delimitation> {
   }
 
   Widget _story() {
-    return Container(
-      color: bgColor,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Column(
-        children: [
-          Expanded(
-            child: (_isLoading)
-                ? Center(child: fadingCircle)
-                : ListView.builder(
-                    itemCount: _delimitationList.length,
-                    itemBuilder: (context, index) {
-                      return delimitationStoryItem(_delimitationList[index]);
-                    },
-                  ),
-          ),
-          seeMore(),
-        ],
-      ),
+    return Column(
+      children: [
+        Expanded(
+          child: (_isLoading)
+              ? Center(child: fadingCircle)
+              : ListView.builder(
+                  itemCount: _morcellementList.length,
+                  itemBuilder: (context, index) {
+                    return _itemStory(_morcellementList[index]);
+                  },
+                ),
+        ),
+        (_isLoading) ? const SizedBox.shrink() : _seeMore(),
+      ],
     );
   }
 
-  Widget delimitationStoryItem(DelimitationModel delimitation) {
+  Widget _itemStory(Morcellement morcellement) {
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      width: double.infinity,
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: inversColor),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Text(
+            'date reception: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(morcellement.date_reception))}',
+            style: const TextStyle(color: textColorSecondary),
+          ),
+          const SizedBox(height: 5),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Date depot dossier :${DateFormat('dd/MM/yyyy').format(DateTime.parse(delimitation.createdAt))}',
-                style: const TextStyle(fontSize: 14, color: textColorSecondary),
+                'Geometre: ${morcellement.name_topographe}',
+                style: const TextStyle(color: textColorSecondary),
+              ),
+              Text(
+                'Propriétaire: ${morcellement.proprietaire}',
+                style: const TextStyle(color: textColorSecondary),
               ),
             ],
           ),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 5),
-            child: Text(
-              delimitation.name_topographe,
-              style: const TextStyle(fontSize: 14, color: textColor),
-            ),
-          ),
-          Text(
-            delimitation.contact_topographe,
-            style: const TextStyle(fontSize: 14, color: textColorSecondary),
-          ),
-          Text(
-            delimitation.proprietaire,
-            style: const TextStyle(fontSize: 14, color: textColorSecondary),
-          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Date retour dossier : ${DateFormat('dd/MM/yyyy').format(DateTime.parse(delimitation.updatedAt))}',
-                style: const TextStyle(fontSize: 14, color: textColorSecondary),
+                'date livraison: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(morcellement.date_livraison))}',
+                style: const TextStyle(color: textColor),
               ),
-              const VoirPlus(),
+              const VoirPlus()
             ],
           ),
         ],
@@ -401,17 +353,43 @@ class _DelimitationState extends State<Delimitation> {
     );
   }
 
-  Widget seeMore() {
+  Widget _seeMore() {
     return Container(
-      padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.only(bottom: 10),
-      width: 100,
-      height: 40,
+      margin: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         color: mainColor,
-        borderRadius: BorderRadius.circular(100),
+        borderRadius: BorderRadius.circular(50),
       ),
-      child: const Center(child: Text('See more')),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: const Text('See More'),
+    );
+  }
+}
+
+class MorcellementListItem extends StatelessWidget {
+  final Morcellement morcellement;
+
+  const MorcellementListItem({super.key, required this.morcellement});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: ListTile(
+        title: Text(morcellement.name_topographe,
+            style: Theme.of(context).textTheme.titleMedium),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Propriétaire: ${morcellement.proprietaire}'),
+            Text('Contact: ${morcellement.contact_topographe}'),
+            Text(
+                'Date de réception: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(morcellement.date_reception))}'),
+          ],
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: () {},
+      ),
     );
   }
 }

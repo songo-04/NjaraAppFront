@@ -1,29 +1,29 @@
 import 'package:appfront/constant/link.dart';
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
-import 'package:appfront/model/work/delimitation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:logger/logger.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
+import 'package:appfront/model/work/morcellement.dart';
+import 'dart:convert';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:http/http.dart' as http;
+import 'package:appfront/utils/spinkit.dart';
 
-class Calendar extends StatefulWidget {
-  const Calendar({super.key});
+class CalendarMorcellement extends StatefulWidget {
+  const CalendarMorcellement({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _CalendarState createState() => _CalendarState();
+  State<CalendarMorcellement> createState() => _CalendarMorcellementState();
 }
 
-class _CalendarState extends State<Calendar> {
+class _CalendarMorcellementState extends State<CalendarMorcellement> {
   bool _isLoading = false;
-  List<DelimitationModel> _delimitationList = [];
+  List<Morcellement> _morcellementList = [];
   final FlutterSecureStorage storage = const FlutterSecureStorage();
   final Logger log = Logger();
   late DateTime _focusedDay;
   late DateTime _selectedDay;
-  late Map<DateTime, List<DelimitationModel>> _events;
+  late Map<DateTime, List<Morcellement>> _events;
 
   @override
   void initState() {
@@ -31,10 +31,10 @@ class _CalendarState extends State<Calendar> {
     _focusedDay = DateTime.now();
     _selectedDay = _focusedDay;
     _events = {};
-    _fetchDelimitation();
+    _fetchMorcellement();
   }
 
-  List<DelimitationModel> _getEventsForDay(DateTime day) {
+  List<Morcellement> _getEventsForDay(DateTime day) {
     return _events[DateTime(day.year, day.month, day.day)] ?? [];
   }
 
@@ -47,43 +47,45 @@ class _CalendarState extends State<Calendar> {
     }
   }
 
-  Future<void> _fetchDelimitation() async {
+  Future<void> _fetchMorcellement() async {
     setState(() {
       _isLoading = true;
     });
     try {
       final token = await storage.read(key: 'token');
       final response = await http.get(
-        Uri.parse('${urlApi}delimitation'),
+        Uri.parse('${urlApi}work/morcellement'),
         headers: {"Authorization": token ?? ''},
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         log.i(response.body);
         final List<dynamic> datas = json.decode(response.body);
         setState(() {
-          _delimitationList =
-              datas.map((data) => DelimitationModel.fromJson(data)).toList();
-          _loadDelimitation();
+          _morcellementList =
+              datas.map((data) => Morcellement.fromJson(data)).toList();
+          _loadMorcellement();
           _isLoading = false;
         });
+      } else {
+        throw Exception('Failed to load morcellement: ${response.statusCode}');
       }
     } catch (e) {
-      log.e('Error fetching delimitation: $e');
+      log.e('Error fetching morcellement: $e');
       setState(() {
         _isLoading = false;
       });
     }
   }
 
-  void _loadDelimitation() {
+  void _loadMorcellement() {
     _events = {};
-    for (var delimitation in _delimitationList) {
-      final date = DateTime.parse(delimitation.createdAt).toLocal();
+    for (var morcellement in _morcellementList) {
+      final date = DateTime.parse(morcellement.date_reception).toLocal();
       final dateKey = DateTime(date.year, date.month, date.day);
       if (_events[dateKey] == null) {
         _events[dateKey] = [];
       }
-      _events[dateKey]!.add(delimitation);
+      _events[dateKey]!.add(morcellement);
     }
     setState(() {});
   }
@@ -91,10 +93,10 @@ class _CalendarState extends State<Calendar> {
   @override
   Widget build(BuildContext context) {
     return _isLoading
-        ? const Center(child: CircularProgressIndicator())
+        ? Center(child: fadingCircle)
         : Column(
             children: [
-              TableCalendar<DelimitationModel>(
+              TableCalendar<Morcellement>(
                 firstDay: DateTime.now().subtract(const Duration(days: 365)),
                 lastDay: DateTime.now().add(const Duration(days: 365)),
                 focusedDay: _focusedDay,
@@ -139,13 +141,20 @@ class _CalendarState extends State<Calendar> {
                   dowTextFormatter: (date, locale) =>
                       DateFormat.E(locale).format(date)[0],
                 ),
+                headerStyle: HeaderStyle(
+                  titleCentered: true,
+                  titleTextFormatter: (date, locale) =>
+                      DateFormat.yMMMMd(locale).format(date),
+                ),
               ),
               Expanded(
                 child: ListView(
                   children: _getEventsForDay(_selectedDay)
                       .map((delimitation) => ListTile(
                             title: Text(delimitation.name_topographe),
-                            subtitle: Text('${delimitation.proprietaire} - ${delimitation.contact_topographe}'),
+                            subtitle: Text(
+                              '${delimitation.proprietaire} - ${delimitation.contact_topographe}',
+                            ),
                           ))
                       .toList(),
                 ),

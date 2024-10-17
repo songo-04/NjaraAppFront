@@ -105,13 +105,12 @@ class _EngineState extends State<Engine> {
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
         margin: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
-          color: (state) ? inversColor : inversColor2,
+          color: (state) ? inversColor : cardColor,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Text(
           txtBtn,
           style: TextStyle(
-            
               color: (state) ? bgColor : inversColor,
               fontWeight: FontWeight.w500),
         ),

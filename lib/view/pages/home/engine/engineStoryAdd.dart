@@ -63,7 +63,7 @@ class _EngineStoryAddPageState extends State<EngineStoryAddPage> {
               borderSide: BorderSide.none,
               borderRadius: BorderRadius.circular(8)),
           filled: true,
-          fillColor: inversColor2,
+          fillColor: cardColor,
         ),
       ),
     );
