@@ -294,10 +294,19 @@ class _MorcellementState extends State<MorcellementPage> {
         Expanded(
           child: (_isLoading)
               ? Center(child: fadingCircle)
-              : ListView.builder(
-                  itemCount: _morcellementList.length,
-                  itemBuilder: (context, index) {
-                    return _itemStory(_morcellementList[index]);
+              : AnimatedList(
+                  initialItemCount: _morcellementList.length,
+                  itemBuilder: (context, index, animation) {
+                    return SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(1, 0),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOut,
+                      )),
+                      child: _itemStory(_morcellementList[index]),
+                    );
                   },
                 ),
         ),
@@ -374,20 +383,29 @@ class MorcellementListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: surfaceColor,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: ListTile(
         title: Text(morcellement.name_topographe,
-            style: Theme.of(context).textTheme.titleMedium),
+            style: const TextStyle(
+              color: textColor,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            )),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Propriétaire: ${morcellement.proprietaire}'),
-            Text('Contact: ${morcellement.contact_topographe}'),
+            Text('Propriétaire: ${morcellement.proprietaire}',
+                style: const TextStyle(color: textColorSecondary)),
+            Text('Contact: ${morcellement.contact_topographe}',
+                style: const TextStyle(color: textColorSecondary)),
             Text(
-                'Date de réception: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(morcellement.date_reception))}'),
+                'Date de réception: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(morcellement.date_reception))}',
+                style: const TextStyle(color: textColorSecondary)),
           ],
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        trailing:
+            const Icon(Icons.arrow_forward_ios, size: 16, color: mainColor),
         onTap: () {},
       ),
     );

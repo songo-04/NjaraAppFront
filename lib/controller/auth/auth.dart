@@ -6,7 +6,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class Auth {
   String baseUrl = 'http://127.0.0.1:8080/njarapi/user/';
-  //String baseUrl = 'https://njarapi-1owhtq2y.b4a.run/njarapi/user/';
 
   Logger log = Logger();
   final _storage = const FlutterSecureStorage();
@@ -20,7 +19,6 @@ class Auth {
   }
 
   Future<dynamic> signup(Map<String, String> body) async {
-    
     var request = await http.post(
       Uri.parse('${urlApi}user/signup'),
       headers: {"Content-type": "application/json"},
