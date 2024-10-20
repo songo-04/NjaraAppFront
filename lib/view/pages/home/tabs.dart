@@ -69,7 +69,7 @@ class _TabsState extends State<Tabs> {
 
   Widget _buildBottomNavigationBar() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: bgColor,
       ),
       child: SafeArea(

@@ -286,13 +286,13 @@ class _DelimitationState extends State<Delimitation> {
                                   leading: CircleAvatar(
                                     backgroundColor: mainColor,
                                     child: Text(
-                                      delimitation.name_topographe[0]
+                                      delimitation.proprietaire[0]
                                           .toUpperCase(),
                                       style: const TextStyle(color: textColor),
                                     ),
                                   ),
                                   title: Text(
-                                    delimitation.name_topographe,
+                                    delimitation.proprietaire,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -310,9 +310,9 @@ class _DelimitationState extends State<Delimitation> {
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
-                                        'Contact: ${delimitation.contact_topographe}',
-                                        style:
-                                            TextStyle(color: Colors.grey[600]),
+                                        'Contact: ${delimitation.contact_proprietaire}',
+                                        style: const TextStyle(
+                                            color: textColorSecondary),
                                       ),
                                     ],
                                   ),
@@ -374,12 +374,12 @@ class _DelimitationState extends State<Delimitation> {
           Container(
             margin: const EdgeInsets.symmetric(vertical: 5),
             child: Text(
-              delimitation.name_topographe,
+              delimitation.proprietaire,
               style: const TextStyle(fontSize: 14, color: textColor),
             ),
           ),
           Text(
-            delimitation.contact_topographe,
+            delimitation.contact_proprietaire,
             style: const TextStyle(fontSize: 14, color: textColorSecondary),
           ),
           Text(

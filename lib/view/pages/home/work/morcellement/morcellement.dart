@@ -337,7 +337,7 @@ class _MorcellementState extends State<MorcellementPage> {
           Row(
             children: [
               Text(
-                'Geometre: ${morcellement.name_topographe}',
+                'Geometre: ${morcellement.numero_parcelle}',
                 style: const TextStyle(color: textColorSecondary),
               ),
               Text(
@@ -386,7 +386,7 @@ class MorcellementListItem extends StatelessWidget {
       color: surfaceColor,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: ListTile(
-        title: Text(morcellement.name_topographe,
+        title: Text(morcellement.numero_parcelle,
             style: const TextStyle(
               color: textColor,
               fontSize: 16,
@@ -397,7 +397,7 @@ class MorcellementListItem extends StatelessWidget {
           children: [
             Text('Propriétaire: ${morcellement.proprietaire}',
                 style: const TextStyle(color: textColorSecondary)),
-            Text('Contact: ${morcellement.contact_topographe}',
+            Text('Contact: ${morcellement.contact_proprietaire}',
                 style: const TextStyle(color: textColorSecondary)),
             Text(
                 'Date de réception: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(morcellement.date_reception))}',

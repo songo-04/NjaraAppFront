@@ -88,7 +88,7 @@ class _StoryMorcellementState extends State<StoryMorcellement> {
           const SizedBox(height: 5),
           Row(
             children: [
-              Text('Geometre: ${morcellement.name_topographe}'),
+              Text('parcelle: ${morcellement.numero_parcelle}'),
               Text('Propriétaire: ${morcellement.proprietaire}'),
             ],
           ),

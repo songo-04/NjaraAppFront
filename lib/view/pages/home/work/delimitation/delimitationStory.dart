@@ -93,19 +93,19 @@ Widget delimitationStoryItem(DelimitationModel delimitation) {
           children: [
             Text(
               'Date depot dossier :${delimitation.createdAt}',
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              style: const TextStyle(fontSize: 14, color: textColorSecondary),
             ),
           ],
         ),
         Container(
           margin: const EdgeInsets.symmetric(vertical: 5),
           child: Text(
-            delimitation.name_topographe,
+            delimitation.proprietaire,
           ),
         ),
         Text(
-          delimitation.contact_topographe,
-          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          delimitation.contact_proprietaire,
+          style: const TextStyle(fontSize: 14, color: textColorSecondary),
         ),
         Text(
           delimitation.proprietaire,

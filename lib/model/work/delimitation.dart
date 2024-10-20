@@ -2,16 +2,24 @@
 
 class DelimitationModel {
   final String userId;
-  final String name_topographe;
-  final String contact_topographe;
+  final String contact_proprietaire;
   final String proprietaire;
+  final String numero_parcelle;
+  final String section;
+  final String canton;
+  final String titre_foncier;
+  final String propriete_dite;
   final String createdAt;
   final String updatedAt;
   DelimitationModel({
     required this.userId,
-    required this.name_topographe,
-    required this.contact_topographe,
+    required this.contact_proprietaire,
     required this.proprietaire,
+    required this.numero_parcelle,
+    required this.section,
+    required this.canton,
+    required this.titre_foncier,
+    required this.propriete_dite,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -19,9 +27,13 @@ class DelimitationModel {
   factory DelimitationModel.fromJson(Map<String, dynamic> json) {
     return DelimitationModel(
         userId: json['userId'],
-        name_topographe: json['name_topographe'],
-        contact_topographe: json['contact_topographe'],
+        contact_proprietaire: json['contact_proprietaire'],
         proprietaire: json['proprietaire'],
+        numero_parcelle: json['numero_parcelle'],
+        section: json['section'],
+        canton: json['canton'],
+        titre_foncier: json['titre_foncier'],
+        propriete_dite: json['propriete_dite'],
         createdAt: json['createdAt'],
         updatedAt: json['updatedAt']);
   }

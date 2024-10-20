@@ -21,11 +21,16 @@ class _AddMorcellementState extends State<AddMorcellement> {
   Logger log = Logger();
   DateTime? selectedDateReception;
   DateTime? selectedDateLivraison;
-  TextEditingController date_reception = TextEditingController();
-  TextEditingController date_livraison = TextEditingController();
-  TextEditingController name_topographe = TextEditingController();
-  TextEditingController contact_topographe = TextEditingController();
-  TextEditingController proprietaire = TextEditingController();
+  TextEditingController date_reception_controller = TextEditingController();
+  TextEditingController date_livraison_controller = TextEditingController();
+  TextEditingController contact_proprietaire_controller =
+      TextEditingController();
+  TextEditingController proprietaire_controller = TextEditingController();
+  TextEditingController numero_parcelle_controller = TextEditingController();
+  TextEditingController section_controller = TextEditingController();
+  TextEditingController canton_controller = TextEditingController();
+  TextEditingController titre_foncier_controller = TextEditingController();
+  TextEditingController propriete_dite_controller = TextEditingController();
 
   Future<void> getUserId() async {
     userId = await apiController.getUserId();
@@ -50,29 +55,54 @@ class _AddMorcellementState extends State<AddMorcellement> {
         decoration: const BoxDecoration(
           color: bgColor,
         ),
-        child: Form(
-          key: globalKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildTextFormField('Nom du topographe', name_topographe,
-                  Icons.person, TextInputType.text),
-              _buildTextFormField('Contact du topographe', contact_topographe,
-                  Icons.phone, TextInputType.text),
-              _buildTextFormField('Propriétaire', proprietaire, Icons.business,
-                  TextInputType.text),
-              _buildDatePicker(context, 'Date reception', 'Date reception',
-                  date_reception, selectedDateReception),
-              _buildDatePicker(context, 'Date livraison', 'Date livraison',
-                  date_livraison, selectedDateLivraison),
-              (charge)
-                  ? const Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: Text('Loading...'),
-                    )
-                  : _buildSubmitButton(),
-            ],
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Form(
+              key: globalKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildTextFormField(
+                      'Nom du proprietaire ',
+                      proprietaire_controller,
+                      Icons.person,
+                      TextInputType.text),
+                  _buildTextFormField(
+                      'Contact du proprietaire',
+                      contact_proprietaire_controller,
+                      Icons.phone,
+                      TextInputType.text),
+                  _buildTextFormField(
+                      'Numero de parcelle',
+                      numero_parcelle_controller,
+                      Icons.numbers,
+                      TextInputType.text),
+                  _buildTextFormField('Section', section_controller,
+                      Icons.numbers, TextInputType.text),
+                  _buildTextFormField('Canton', canton_controller,
+                      Icons.numbers, TextInputType.text),
+                  _buildTextFormField('Titre foncier', titre_foncier_controller,
+                      Icons.numbers, TextInputType.text),
+                  _buildTextFormField(
+                      'Propriete dite',
+                      propriete_dite_controller,
+                      Icons.numbers,
+                      TextInputType.text),
+                  _buildDatePicker(context, 'Date reception', 'Date reception',
+                      date_reception_controller, selectedDateReception),
+                  _buildDatePicker(context, 'Date livraison', 'Date livraison',
+                      date_livraison_controller, selectedDateLivraison),
+                  (charge)
+                      ? const Padding(
+                          padding: EdgeInsets.only(top: 20),
+                          child: Text('Loading...'),
+                        )
+                      : _buildSubmitButton(),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -151,11 +181,15 @@ class _AddMorcellementState extends State<AddMorcellement> {
   }
 
   void _submitForm() async {
-    if (name_topographe.text.isEmpty ||
-        contact_topographe.text.isEmpty ||
-        proprietaire.text.isEmpty ||
-        date_reception.text.isEmpty ||
-        date_livraison.text.isEmpty) {
+    if (contact_proprietaire_controller.text.isEmpty ||
+        proprietaire_controller.text.isEmpty ||
+        numero_parcelle_controller.text.isEmpty ||
+        section_controller.text.isEmpty ||
+        canton_controller.text.isEmpty ||
+        titre_foncier_controller.text.isEmpty ||
+        propriete_dite_controller.text.isEmpty ||
+        date_reception_controller.text.isEmpty ||
+        date_livraison_controller.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Tous les champs sont obligatoires')),
       );
@@ -167,11 +201,15 @@ class _AddMorcellementState extends State<AddMorcellement> {
       });
       Map<String, dynamic> data = {
         'userId': userId,
-        'name_topographe': name_topographe.text,
-        'contact_topographe': contact_topographe.text,
-        'proprietaire': proprietaire.text,
-        'date_reception': date_reception.text,
-        'date_livraison': date_livraison.text,
+        'contact_proprietaire': contact_proprietaire_controller.text,
+        'proprietaire': proprietaire_controller.text,
+        'numero_parcelle': numero_parcelle_controller.text,
+        'section': section_controller.text,
+        'canton': canton_controller.text,
+        'titre_foncier': titre_foncier_controller.text,
+        'propriete_dite': propriete_dite_controller.text,
+        'date_reception': date_reception_controller.text,
+        'date_livraison': date_livraison_controller.text,
       };
       log.i(data.toString());
       await apiController.create(data, 'work/morcellement');

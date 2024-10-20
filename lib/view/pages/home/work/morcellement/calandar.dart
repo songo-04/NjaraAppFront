@@ -151,9 +151,9 @@ class _CalendarMorcellementState extends State<CalendarMorcellement> {
                 child: ListView(
                   children: _getEventsForDay(_selectedDay)
                       .map((delimitation) => ListTile(
-                            title: Text(delimitation.name_topographe),
+                            title: Text(delimitation.numero_parcelle),
                             subtitle: Text(
-                              '${delimitation.proprietaire} - ${delimitation.contact_topographe}',
+                              '${delimitation.proprietaire} - ${delimitation.contact_proprietaire}',
                             ),
                           ))
                       .toList(),
