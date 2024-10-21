@@ -1,8 +1,11 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:convert';
 import 'package:appfront/constant/color.dart';
 import 'package:appfront/constant/link.dart';
 import 'package:appfront/model/work/morcellement.dart';
 import 'package:appfront/utils/spinkit.dart';
+import 'package:appfront/utils/voirPlus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
@@ -10,8 +13,6 @@ import 'package:logger/logger.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'addMorcellement.dart';
 import 'package:http/http.dart' as http;
-import 'package:appfront/utils/voirPlus.dart';
-import 'package:flutter/services.dart';
 
 class MorcellementPage extends StatefulWidget {
   const MorcellementPage({super.key});
@@ -98,129 +99,134 @@ class _MorcellementState extends State<MorcellementPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: bgColor,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            height: 80,
-            width: double.infinity,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isCalendar = !_isCalendar;
-                      });
-                    },
-                    icon: Icon(
-                      _isCalendar ? Icons.calendar_month : Icons.list,
-                      color: textColor,
-                    )),
-                const Text('Morcellement', style: TextStyle(color: textColor)),
-                IconButton(
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          height: 80,
+          width: double.infinity,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              IconButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AddMorcellement()),
-                    );
+                    setState(() {
+                      _isCalendar = !_isCalendar;
+                    });
                   },
-                  icon: const Icon(
-                    Icons.add,
+                  icon: Icon(
+                    _isCalendar ? Icons.calendar_month : Icons.list,
                     color: textColor,
-                  ),
-                )
-              ],
-            ),
+                  )),
+              const Text('Morcellement', style: TextStyle(color: textColor)),
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const AddMorcellement()),
+                  );
+                },
+                icon: const Icon(
+                  Icons.add,
+                  color: textColor,
+                ),
+              )
+            ],
           ),
-          Expanded(child: _isCalendar ? _calendar() : _story())
-        ],
-      ),
+        ),
+        Expanded(child: _isCalendar ? _calendar() : _story())
+      ],
     );
   }
 
   Widget _calendar() {
     return Column(
       children: [
-        TableCalendar<Morcellement>(
-          firstDay: DateTime.now().subtract(const Duration(days: 365)),
-          lastDay: DateTime.now().add(const Duration(days: 365)),
-          focusedDay: _focusedDay,
-          selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-          eventLoader: _getEventsForDay,
-          onDaySelected: _onDaySelected,
-          calendarStyle: CalendarStyle(
-            markersAutoAligned: true,
-            markerSize: 8,
-            markerDecoration: const BoxDecoration(
-              color: mainColor,
-              shape: BoxShape.circle,
-            ),
-            // Adjust text colors for dark mode
-            defaultTextStyle: const TextStyle(color: textColor),
-            weekendTextStyle: const TextStyle(color: textColor),
-            selectedTextStyle: const TextStyle(color: bgColor),
-            todayTextStyle: const TextStyle(color: bgColor),
-            outsideTextStyle: TextStyle(color: textColor.withOpacity(0.5)),
-            // Adjust decoration colors for dark mode
-            selectedDecoration:
-                const BoxDecoration(color: mainColor, shape: BoxShape.circle),
-            todayDecoration: BoxDecoration(
-                color: mainColor.withOpacity(0.5), shape: BoxShape.circle),
-            defaultDecoration: const BoxDecoration(shape: BoxShape.circle),
-            weekendDecoration: const BoxDecoration(shape: BoxShape.circle),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: cardColor.withOpacity(0.4),
+            borderRadius: BorderRadius.circular(10),
           ),
-          calendarBuilders: CalendarBuilders(
-            markerBuilder: (context, date, events) {
-              if (events.isNotEmpty) {
-                return Positioned(
-                  right: 1,
-                  bottom: 1,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: mainColor.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      '${events.length}',
-                      style: const TextStyle(
-                        color: textColor,
-                        fontSize: 10,
+          child: TableCalendar<Morcellement>(
+            firstDay: DateTime.now().subtract(const Duration(days: 365)),
+            lastDay: DateTime.now().add(const Duration(days: 365)),
+            focusedDay: _focusedDay,
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            eventLoader: _getEventsForDay,
+            onDaySelected: _onDaySelected,
+            calendarStyle: CalendarStyle(
+              markersAutoAligned: true,
+              markerSize: 8,
+              markerDecoration: const BoxDecoration(
+                color: mainColor,
+                shape: BoxShape.circle,
+              ),
+              // Adjust text colors for dark mode
+              defaultTextStyle: const TextStyle(color: textColor),
+              weekendTextStyle: const TextStyle(color: textColor),
+              selectedTextStyle: const TextStyle(color: bgColor),
+              todayTextStyle: const TextStyle(color: bgColor),
+              outsideTextStyle: TextStyle(color: textColor.withOpacity(0.5)),
+              // Adjust decoration colors for dark mode
+              selectedDecoration:
+                  const BoxDecoration(color: mainColor, shape: BoxShape.circle),
+              todayDecoration: BoxDecoration(
+                  color: mainColor.withOpacity(0.5), shape: BoxShape.circle),
+              defaultDecoration: const BoxDecoration(shape: BoxShape.circle),
+              weekendDecoration: const BoxDecoration(shape: BoxShape.circle),
+            ),
+            calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, date, events) {
+                if (events.isNotEmpty) {
+                  return Positioned(
+                    right: 1,
+                    bottom: 1,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: mainColor.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        '${events.length}',
+                        style: const TextStyle(
+                          color: textColor,
+                          fontSize: 10,
+                        ),
                       ),
                     ),
+                  );
+                }
+                return null;
+              },
+              dowBuilder: (context, day) {
+                return Center(
+                  child: Text(
+                    DateFormat.E().format(day)[0],
+                    style: const TextStyle(
+                        color: textColor, fontWeight: FontWeight.bold),
                   ),
                 );
-              }
-              return null;
-            },
-            dowBuilder: (context, day) {
-              return Center(
-                child: Text(
-                  DateFormat.E().format(day)[0],
-                  style: const TextStyle(
-                      color: textColor, fontWeight: FontWeight.bold),
-                ),
-              );
-            },
-          ),
-          daysOfWeekHeight: 20,
-          daysOfWeekStyle: DaysOfWeekStyle(
-            dowTextFormatter: (date, locale) =>
-                DateFormat.E(locale).format(date)[0],
-          ),
-          headerStyle: const HeaderStyle(
-            formatButtonVisible: false,
-            titleCentered: true,
-            titleTextStyle: TextStyle(color: textColor),
-            leftChevronIcon: Icon(Icons.chevron_left, color: textColor),
-            rightChevronIcon: Icon(Icons.chevron_right, color: textColor),
+              },
+            ),
+            daysOfWeekHeight: 20,
+            daysOfWeekStyle: DaysOfWeekStyle(
+              dowTextFormatter: (date, locale) =>
+                  DateFormat.E(locale).format(date)[0],
+            ),
+            headerStyle: const HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+              titleTextStyle: TextStyle(color: textColor),
+              leftChevronIcon: Icon(Icons.chevron_left, color: textColor),
+              rightChevronIcon: Icon(Icons.chevron_right, color: textColor),
+            ),
           ),
         ),
+        const SizedBox(height: 12),
         Expanded(
           child: _isLoading
               ? Center(child: fadingCircle)
@@ -318,12 +324,11 @@ class _MorcellementState extends State<MorcellementPage> {
 
   Widget _itemStory(Morcellement morcellement) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.all(12),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: cardColor,
-        border: Border.all(color: inversColor),
+        color: cardColor.withOpacity(0.4),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -371,7 +376,7 @@ class _MorcellementState extends State<MorcellementPage> {
         borderRadius: BorderRadius.circular(50),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: const Text('See More'),
+      child: const Text('Voir plus', style: TextStyle(color: bgColor)),
     );
   }
 }
@@ -383,9 +388,13 @@ class MorcellementListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: surfaceColor,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 14),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: cardColor.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: ListTile(
         title: Text(morcellement.numero_parcelle,
             style: const TextStyle(
@@ -429,8 +438,7 @@ class MorcellementListItem extends StatelessWidget {
 class MorcellementDetailsSheet extends StatefulWidget {
   final Morcellement morcellement;
 
-  const MorcellementDetailsSheet({Key? key, required this.morcellement})
-      : super(key: key);
+  const MorcellementDetailsSheet({super.key, required this.morcellement});
 
   @override
   _MorcellementDetailsSheetState createState() =>

@@ -11,7 +11,6 @@ import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:table_calendar/table_calendar.dart';
 import 'package:appfront/utils/voirPlus.dart';
-import 'package:flutter/services.dart';
 
 class Delimitation extends StatefulWidget {
   const Delimitation({super.key});
@@ -97,127 +96,133 @@ class _DelimitationState extends State<Delimitation> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: bgColor,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            height: 80,
-            width: double.infinity,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isCalendar = !_isCalendar;
-                      });
-                    },
-                    icon: Icon(
-                      _isCalendar ? Icons.calendar_month : Icons.list,
-                      color: textColor,
-                    )),
-                const Text('Delimitation', style: TextStyle(color: textColor)),
-                IconButton(
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          height: 80,
+          width: double.infinity,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const AddDelimitation()));
+                    setState(() {
+                      _isCalendar = !_isCalendar;
+                    });
                   },
-                  icon: const Icon(
-                    Icons.add,
+                  icon: Icon(
+                    _isCalendar ? Icons.calendar_month : Icons.list,
                     color: textColor,
-                  ),
-                )
-              ],
-            ),
+                  )),
+              const Text('Delimitation', style: TextStyle(color: textColor)),
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AddDelimitation()));
+                },
+                icon: const Icon(
+                  Icons.add,
+                  color: textColor,
+                ),
+              )
+            ],
           ),
-          Expanded(child: _isCalendar ? _calendar() : _story())
-        ],
-      ),
+        ),
+        Expanded(child: _isCalendar ? _calendar() : _story())
+      ],
     );
   }
 
   Widget _calendar() {
     return Column(
       children: [
-        TableCalendar<DelimitationModel>(
-          firstDay: DateTime.now().subtract(const Duration(days: 365)),
-          lastDay: DateTime.now().add(const Duration(days: 365)),
-          focusedDay: _focusedDay,
-          selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-          eventLoader: _getEventsForDay,
-          onDaySelected: _onDaySelected,
-          calendarStyle: CalendarStyle(
-            markersAutoAligned: true,
-            markerSize: 8,
-            markerDecoration: const BoxDecoration(
-              color: mainColor,
-              shape: BoxShape.circle,
-            ),
-            // Adjust text colors for dark mode
-            defaultTextStyle: const TextStyle(color: textColor),
-            weekendTextStyle: const TextStyle(color: textColor),
-            selectedTextStyle: const TextStyle(color: bgColor),
-            todayTextStyle: const TextStyle(color: bgColor),
-            outsideTextStyle: TextStyle(color: textColor.withOpacity(0.5)),
-            // Adjust decoration colors for dark mode
-            selectedDecoration:
-                const BoxDecoration(color: mainColor, shape: BoxShape.circle),
-            todayDecoration: BoxDecoration(
-                color: mainColor.withOpacity(0.5), shape: BoxShape.circle),
-            defaultDecoration: const BoxDecoration(shape: BoxShape.circle),
-            weekendDecoration: const BoxDecoration(shape: BoxShape.circle),
+        Container(
+          padding: const EdgeInsets.all(8),
+          margin: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: cardColor.withOpacity(0.4),
+            borderRadius: BorderRadius.circular(10),
           ),
-          calendarBuilders: CalendarBuilders(
-            markerBuilder: (context, date, events) {
-              if (events.isNotEmpty) {
-                return Positioned(
-                  right: 1,
-                  bottom: 1,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: mainColor.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      '${events.length}',
-                      style: const TextStyle(
-                        color: textColor,
-                        fontSize: 10,
+          child: TableCalendar<DelimitationModel>(
+            firstDay: DateTime.now().subtract(const Duration(days: 365)),
+            lastDay: DateTime.now().add(const Duration(days: 365)),
+            focusedDay: _focusedDay,
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            eventLoader: _getEventsForDay,
+            onDaySelected: _onDaySelected,
+            calendarStyle: CalendarStyle(
+              markersAutoAligned: true,
+              markerSize: 8,
+              markerDecoration: const BoxDecoration(
+                color: mainColor,
+                shape: BoxShape.circle,
+              ),
+              // Adjust text colors for dark mode
+              defaultTextStyle: const TextStyle(color: textColor),
+              weekendTextStyle: const TextStyle(color: textColor),
+              selectedTextStyle: const TextStyle(color: bgColor),
+              todayTextStyle: const TextStyle(color: bgColor),
+              outsideTextStyle: TextStyle(color: textColor.withOpacity(0.5)),
+              // Adjust decoration colors for dark mode
+              selectedDecoration:
+                  const BoxDecoration(color: mainColor, shape: BoxShape.circle),
+              todayDecoration: BoxDecoration(
+                  color: mainColor.withOpacity(0.5), shape: BoxShape.circle),
+              defaultDecoration: const BoxDecoration(shape: BoxShape.circle),
+              weekendDecoration: const BoxDecoration(shape: BoxShape.circle),
+            ),
+            calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, date, events) {
+                if (events.isNotEmpty) {
+                  return Positioned(
+                    right: 1,
+                    bottom: 1,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: mainColor.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        '${events.length}',
+                        style: const TextStyle(
+                          color: textColor,
+                          fontSize: 10,
+                        ),
                       ),
                     ),
+                  );
+                }
+                return null;
+              },
+              dowBuilder: (context, day) {
+                return Center(
+                  child: Text(
+                    DateFormat.E().format(day)[0],
+                    style: const TextStyle(
+                        color: textColor, fontWeight: FontWeight.bold),
                   ),
                 );
-              }
-              return null;
-            },
-            dowBuilder: (context, day) {
-              return Center(
-                child: Text(
-                  DateFormat.E().format(day)[0],
-                  style: const TextStyle(
-                      color: textColor, fontWeight: FontWeight.bold),
-                ),
-              );
-            },
-          ),
-          daysOfWeekHeight: 20,
-          daysOfWeekStyle: const DaysOfWeekStyle(
-            weekdayStyle: TextStyle(color: textColor),
-            weekendStyle: TextStyle(color: textColor),
-          ),
-          headerStyle: const HeaderStyle(
-            formatButtonVisible: false,
-            titleCentered: true,
-            titleTextStyle: TextStyle(color: textColor),
-            leftChevronIcon: Icon(Icons.chevron_left, color: textColor),
-            rightChevronIcon: Icon(Icons.chevron_right, color: textColor),
+              },
+            ),
+            daysOfWeekHeight: 20,
+            daysOfWeekStyle: const DaysOfWeekStyle(
+              weekdayStyle: TextStyle(color: textColor),
+              weekendStyle: TextStyle(color: textColor),
+            ),
+            headerStyle: const HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+              titleTextStyle: TextStyle(color: textColor),
+              leftChevronIcon: Icon(Icons.chevron_left, color: textColor),
+              rightChevronIcon: Icon(Icons.chevron_right, color: textColor),
+            ),
           ),
         ),
+        const SizedBox(height: 12),
         Expanded(
           child: _isLoading
               ? Center(child: fadingCircle)
@@ -288,7 +293,6 @@ class _DelimitationState extends State<Delimitation> {
 
   Widget _story() {
     return Container(
-      color: bgColor,
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
@@ -311,12 +315,10 @@ class _DelimitationState extends State<Delimitation> {
   Widget delimitationStoryItem(DelimitationModel delimitation) {
     return Container(
       padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 14),
       decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: inversColor),
-      ),
+          color: cardColor.withOpacity(0.4),
+          borderRadius: BorderRadius.circular(10)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -381,10 +383,13 @@ class DelimitationListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: cardColor,
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 14),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: cardColor.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: ListTile(
         title: Text(
           delimitation.proprietaire,
