@@ -1,8 +1,6 @@
 // ignore_for_file: file_names
 
 import 'dart:convert';
-import 'dart:io';
-import 'package:appfront/view/pages/home/contact/contactDetail.dart';
 import 'package:appfront/utils/spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -21,20 +19,30 @@ class AfficheContact extends StatefulWidget {
   State<AfficheContact> createState() => _AfficheContactState();
 }
 
-class _AfficheContactState extends State<AfficheContact> {
-  List<ContactModel> _contactList = [];
+class _AfficheContactState extends State<AfficheContact>
+    with AutomaticKeepAliveClientMixin {
+  static List<ContactModel> _contactList = [];
+  static bool _dataFetched = false;
   Logger log = Logger();
   final FlutterSecureStorage storage = const FlutterSecureStorage();
-  bool charge = false;
+  bool _isLoading = false;
+
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   void initState() {
     super.initState();
-    _fetchContact();
+    if (!_dataFetched) {
+      _fetchContact();
+    }
   }
 
   Future<void> _fetchContact() async {
+    if (_dataFetched) return;
+
     setState(() {
-      charge = true;
+      _isLoading = true;
     });
     try {
       final token = await storage.read(key: 'token');
@@ -48,7 +56,8 @@ class _AfficheContactState extends State<AfficheContact> {
         setState(() {
           _contactList =
               datas.map((data) => ContactModel.fromJson(data)).toList();
-          charge = false;
+          _isLoading = false;
+          _dataFetched = true;
         });
       } else {
         throw Exception('Failed to load contacts: ${response.statusCode}');
@@ -56,14 +65,22 @@ class _AfficheContactState extends State<AfficheContact> {
     } catch (e) {
       log.e('Error fetching contacts: $e');
       setState(() {
-        charge = false;
+        _isLoading = false;
       });
     }
   }
 
+  Future<void> refreshContacts() async {
+    setState(() {
+      _dataFetched = false;
+    });
+    await _fetchContact();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return (charge)
+    super.build(context);
+    return (_isLoading)
         ? Center(child: fadingCircle)
         : _contactList.isEmpty
             ? _emptyContactList()
@@ -127,9 +144,6 @@ class _AfficheContactState extends State<AfficheContact> {
 Widget _contactItem(BuildContext context, ContactModel contact) {
   return InkWell(
     onTap: () {
-      _showContactOptions(context, contact);
-    },
-    onLongPress: () {
       _showContactOptions(context, contact);
     },
     child: Container(
@@ -260,7 +274,7 @@ void _showContactOptions(BuildContext context, ContactModel contact) {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _actionButton(Icons.call, 'Appeler', () async {
+                      _actionButton(Icons.call, 'Call', () async {
                         final Uri launchUri = Uri(
                           scheme: 'tel',
                           path: contact.contact_number,
@@ -279,10 +293,10 @@ void _showContactOptions(BuildContext context, ContactModel contact) {
                       _actionButton(Icons.message, 'Message', () async {
                         await _sendMessage(context, contact.contact_number);
                       }),
-                      _actionButton(Icons.edit, 'Modifier', () {
+                      _actionButton(Icons.edit, 'Edit', () {
                         Navigator.pop(context);
                       }),
-                      _actionButton(Icons.delete, 'Supprimer', () {
+                      _actionButton(Icons.delete, 'Delete', () {
                         Navigator.pop(context);
                       }),
                     ],
@@ -341,7 +355,7 @@ Future<void> _sendMessage(BuildContext context, String phoneNumber) async {
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Impossible d'ouvrir l'application de messagerie: $e"),
+        content: Text("Failed to open message: $e"),
       ),
     );
   }

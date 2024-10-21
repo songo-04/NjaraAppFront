@@ -377,8 +377,7 @@ class _DelimitationState extends State<Delimitation> {
 class DelimitationListItem extends StatelessWidget {
   final DelimitationModel delimitation;
 
-  const DelimitationListItem({Key? key, required this.delimitation})
-      : super(key: key);
+  const DelimitationListItem({super.key, required this.delimitation});
 
   @override
   Widget build(BuildContext context) {

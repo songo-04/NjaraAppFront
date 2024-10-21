@@ -37,44 +37,79 @@ class _TabsState extends State<Tabs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
-      drawer: _buildDrawer(),
-      body: Container(
-        decoration: const BoxDecoration(
-          color: bgColor,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: bgColor,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.transparent,
+                spreadRadius: 0,
+                blurRadius: 0,
+              ),
+            ],
+          ),
+          child: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            leadingWidth: 60,
+            leading: Builder(
+              builder: (BuildContext context) {
+                return IconButton(
+                  icon: const Icon(Icons.menu, color: textColor, size: 28),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                  tooltip:
+                      MaterialLocalizations.of(context).openAppDrawerTooltip,
+                );
+              },
+            ),
+            title: const Text(
+              'AppName',
+              style: TextStyle(
+                color: textColor,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.notifications_outlined,
+                    color: textColor, size: 26),
+                onPressed: () => navigation(context, const NotificationPage()),
+                tooltip: 'Notifications',
+              ),
+              IconButton(
+                icon: const Icon(Icons.search, color: textColor, size: 26),
+                onPressed: () => navigation(context, const SearchPage()),
+                tooltip: 'Search',
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
         ),
-        child: _screens[_index],
       ),
+      drawer: _buildDrawer(),
+      body: _screens[_index],
       bottomNavigationBar: _buildBottomNavigationBar(),
-    );
-  }
-
-  AppBar _buildAppBar() {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: bgColor,
-      foregroundColor: textColor,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.notifications, color: textColor),
-          onPressed: () => navigation(context, const NotificationPage()),
-        ),
-        IconButton(
-          icon: const Icon(Icons.search, color: textColor),
-          onPressed: () => navigation(context, const SearchPage()),
-        ),
-      ],
     );
   }
 
   Widget _buildBottomNavigationBar() {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: bgColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 15,
+            offset: const Offset(0, -5),
+          ),
+        ],
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -99,34 +134,56 @@ class _TabsState extends State<Tabs> {
     bool isSelected = _index == index;
     return GestureDetector(
       onTap: () => setState(() => _index = index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding:
-            EdgeInsets.symmetric(horizontal: 12, vertical: isSelected ? 8 : 12),
-        decoration: BoxDecoration(
-          color: isSelected ? mainColor.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isSelected ? activeIcon : icon,
-              color: isSelected ? mainColor : textColorSecondary,
-              size: 24,
-            ),
-            if (isSelected) ...[
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: mainColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+      child: Transform(
+        transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.001)
+          ..rotateX(isSelected ? -0.2 : 0.0),
+        alignment: Alignment.center,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          padding: EdgeInsets.symmetric(
+              horizontal: 12, vertical: isSelected ? 8 : 12),
+          decoration: BoxDecoration(
+            color: isSelected ? mainColor.withOpacity(0.2) : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: mainColor.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    )
+                  ]
+                : [],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isSelected ? activeIcon : icon,
+                color: isSelected ? mainColor : textColorSecondary,
+                size: 28,
               ),
+              if (isSelected) ...[
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: mainColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    shadows: [
+                      Shadow(
+                        color: mainColor.withOpacity(0.3),
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -239,7 +296,7 @@ class _TabsState extends State<Tabs> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(icon, size: 24, color: inversColor.withOpacity(0.8)),
+            Icon(icon, size: 24, color: mainColor.withOpacity(0.8)),
             const SizedBox(width: 20),
             Expanded(
               child: Text(
@@ -252,7 +309,7 @@ class _TabsState extends State<Tabs> {
               ),
             ),
             Icon(Icons.chevron_right,
-                size: 20, color: inversColor.withOpacity(0.5)),
+                size: 20, color: mainColor.withOpacity(0.5)),
           ],
         ),
       ),

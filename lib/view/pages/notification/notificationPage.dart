@@ -70,17 +70,18 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   void _startDailyCheck() {
-    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
       final now = DateTime.now();
       logger.d('Checking time: ${now.hour}:${now.minute}:${now.second}');
 
-      if (now.hour == 19 && now.minute == 00 && !_notificationSent) {
+      if (now.hour == 19 && now.minute == 0 && !_notificationSent) {
         logger.d('Time matched, showing notification');
         _showDailyNotification();
         _notificationSent = true;
       }
 
-      if (now.hour == 20 && now.minute == 12) {
+      // Reset the flag at midnight
+      if (now.hour == 0 && now.minute == 0) {
         _notificationSent = false;
       }
     });
@@ -113,7 +114,7 @@ class _NotificationPageState extends State<NotificationPage> {
       await flutterLocalNotificationsPlugin.show(
         0,
         'Rappel quotidien',
-        'Il est 20h11 !',
+        'Il est 19h00, n\'oubliez pas de vérifier vos tâches !',
         platformChannelSpecifics,
       );
       logger.d('Notification sent successfully');
