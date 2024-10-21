@@ -11,6 +11,7 @@ import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:table_calendar/table_calendar.dart';
 import 'package:appfront/utils/voirPlus.dart';
+import 'package:flutter/services.dart';
 
 class Delimitation extends StatefulWidget {
   const Delimitation({super.key});
@@ -276,51 +277,8 @@ class _DelimitationState extends State<Delimitation> {
                     )
                   : ListView(
                       children: _getEventsForDay(_selectedDay)
-                          .map((delimitation) => Card(
-                                color: cardColor,
-                                elevation: 2,
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 16),
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.all(16),
-                                  leading: CircleAvatar(
-                                    backgroundColor: mainColor,
-                                    child: Text(
-                                      delimitation.proprietaire[0]
-                                          .toUpperCase(),
-                                      style: const TextStyle(color: textColor),
-                                    ),
-                                  ),
-                                  title: Text(
-                                    delimitation.proprietaire,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Propriétaire: ${delimitation.proprietaire}',
-                                        style: const TextStyle(
-                                            color: textColorSecondary),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        'Contact: ${delimitation.contact_proprietaire}',
-                                        style: const TextStyle(
-                                            color: textColorSecondary),
-                                      ),
-                                    ],
-                                  ),
-                                  trailing: const Icon(Icons.arrow_forward_ios,
-                                      color: mainColor),
-                                  onTap: () {},
-                                ),
-                              ))
+                          .map((delimitation) =>
+                              DelimitationListItem(delimitation: delimitation))
                           .toList(),
                     ),
         ),
@@ -412,6 +370,249 @@ class _DelimitationState extends State<Delimitation> {
         borderRadius: BorderRadius.circular(100),
       ),
       child: const Center(child: Text('See more')),
+    );
+  }
+}
+
+class DelimitationListItem extends StatelessWidget {
+  final DelimitationModel delimitation;
+
+  const DelimitationListItem({Key? key, required this.delimitation})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: cardColor,
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: ListTile(
+        title: Text(
+          delimitation.proprietaire,
+          style: const TextStyle(
+            color: textColor,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Contact: ${delimitation.contact_proprietaire}',
+                style: const TextStyle(color: textColorSecondary)),
+            Text(
+                'Date de création: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(delimitation.createdAt))}',
+                style: const TextStyle(color: textColorSecondary)),
+          ],
+        ),
+        trailing:
+            const Icon(Icons.arrow_forward_ios, size: 16, color: mainColor),
+        onTap: () {
+          _showDelimitationDetails(context, delimitation);
+        },
+      ),
+    );
+  }
+
+  void _showDelimitationDetails(
+      BuildContext context, DelimitationModel delimitation) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) =>
+          DelimitationDetailsSheet(delimitation: delimitation),
+    );
+  }
+}
+
+class DelimitationDetailsSheet extends StatefulWidget {
+  final DelimitationModel delimitation;
+
+  const DelimitationDetailsSheet({Key? key, required this.delimitation})
+      : super(key: key);
+
+  @override
+  _DelimitationDetailsSheetState createState() =>
+      _DelimitationDetailsSheetState();
+}
+
+class _DelimitationDetailsSheetState extends State<DelimitationDetailsSheet>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return FractionallySizedBox(
+          heightFactor: 0.7 * _animation.value,
+          child: DraggableScrollableSheet(
+            initialChildSize: 1.0,
+            minChildSize: 0.5,
+            maxChildSize: 1.0,
+            builder: (_, controller) => Container(
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                children: [
+                  _buildHandle(),
+                  Expanded(
+                    child: ListView(
+                      controller: controller,
+                      padding: const EdgeInsets.all(16),
+                      children: [
+                        _buildHeader(),
+                        const SizedBox(height: 16),
+                        _buildDetailsList(),
+                        const SizedBox(height: 24),
+                        _buildActionButtons(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHandle() {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).pop(),
+      child: Container(
+        width: 40,
+        height: 5,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(2.5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.delimitation.proprietaire,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: textColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Créé le ${DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.delimitation.createdAt))}',
+          style: const TextStyle(color: textColorSecondary),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailsList() {
+    return Column(
+      children: [
+        _detailItem('Propriétaire', widget.delimitation.proprietaire),
+        _detailItem('Contact', widget.delimitation.contact_proprietaire),
+        _detailItem(
+            'Date de création',
+            DateFormat('dd/MM/yyyy HH:mm')
+                .format(DateTime.parse(widget.delimitation.createdAt))),
+        _detailItem(
+            'Dernière mise à jour',
+            DateFormat('dd/MM/yyyy HH:mm')
+                .format(DateTime.parse(widget.delimitation.updatedAt))),
+        // Ajoutez d'autres détails ici selon votre modèle DelimitationModel
+      ],
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        ElevatedButton.icon(
+          onPressed: () {
+            // Implement edit functionality
+          },
+          icon: const Icon(Icons.edit),
+          label: const Text('Modifier'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: mainColor,
+            foregroundColor: bgColor,
+          ),
+        ),
+        ElevatedButton.icon(
+          onPressed: () {
+            // Implement delete functionality
+          },
+          icon: const Icon(Icons.delete),
+          label: const Text('Supprimer'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            foregroundColor: bgColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _detailItem(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              '$label:',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: textColorSecondary,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              value,
+              style: const TextStyle(color: textColor),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

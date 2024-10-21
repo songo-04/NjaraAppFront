@@ -11,6 +11,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'addMorcellement.dart';
 import 'package:http/http.dart' as http;
 import 'package:appfront/utils/voirPlus.dart';
+import 'package:flutter/services.dart';
 
 class MorcellementPage extends StatefulWidget {
   const MorcellementPage({super.key});
@@ -406,8 +407,196 @@ class MorcellementListItem extends StatelessWidget {
         ),
         trailing:
             const Icon(Icons.arrow_forward_ios, size: 16, color: mainColor),
-        onTap: () {},
+        onTap: () {
+          _showMorcellementDetails(context, morcellement);
+        },
       ),
+    );
+  }
+
+  void _showMorcellementDetails(
+      BuildContext context, Morcellement morcellement) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) =>
+          MorcellementDetailsSheet(morcellement: morcellement),
+    );
+  }
+}
+
+class MorcellementDetailsSheet extends StatefulWidget {
+  final Morcellement morcellement;
+
+  const MorcellementDetailsSheet({Key? key, required this.morcellement})
+      : super(key: key);
+
+  @override
+  _MorcellementDetailsSheetState createState() =>
+      _MorcellementDetailsSheetState();
+}
+
+class _MorcellementDetailsSheetState extends State<MorcellementDetailsSheet>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return FractionallySizedBox(
+          heightFactor: 0.7 * _animation.value,
+          child: DraggableScrollableSheet(
+            initialChildSize: 1.0,
+            minChildSize: 0.5,
+            maxChildSize: 1.0,
+            builder: (_, controller) => Container(
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                children: [
+                  _buildHandle(),
+                  Expanded(
+                    child: ListView(
+                      controller: controller,
+                      padding: const EdgeInsets.all(16),
+                      children: [
+                        _buildHeader(),
+                        const SizedBox(height: 16),
+                        _buildDetailsList(),
+                        const SizedBox(height: 24),
+                        _buildActionButtons(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHandle() {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).pop(),
+      child: Container(
+        width: 40,
+        height: 5,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(2.5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Parcelle ${widget.morcellement.numero_parcelle}',
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: textColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Reçu le ${DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.morcellement.date_reception))}',
+          style: const TextStyle(color: textColorSecondary),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailsList() {
+    return Column(
+      children: [
+        _detailItem('Propriétaire', widget.morcellement.proprietaire),
+        _detailItem('Contact', widget.morcellement.contact_proprietaire),
+        _detailItem(
+            'Date de réception',
+            DateFormat('dd/MM/yyyy')
+                .format(DateTime.parse(widget.morcellement.date_reception))),
+        _detailItem(
+            'Date de livraison',
+            DateFormat('dd/MM/yyyy')
+                .format(DateTime.parse(widget.morcellement.date_livraison))),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Column(
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            // Ajouter l'action ici
+          },
+          child: const Text('Action'),
+        ),
+        const SizedBox(height: 16),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Fermer'),
+        ),
+      ],
+    );
+  }
+
+  Widget _detailItem(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: textColorSecondary,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            color: textColor,
+          ),
+        ),
+      ],
     );
   }
 }

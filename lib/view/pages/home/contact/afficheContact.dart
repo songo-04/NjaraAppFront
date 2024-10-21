@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'dart:convert';
+import 'dart:io';
 import 'package:appfront/view/pages/home/contact/contactDetail.dart';
 import 'package:appfront/utils/spinkit.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:appfront/constant/link.dart';
 import 'package:appfront/model/contact/contact.dart';
 import 'package:appfront/view/pages/home/contact/createContactPage.dart';
 import 'package:appfront/constant/color.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AfficheContact extends StatefulWidget {
   const AfficheContact({super.key});
@@ -125,8 +127,10 @@ class _AfficheContactState extends State<AfficheContact> {
 Widget _contactItem(BuildContext context, ContactModel contact) {
   return InkWell(
     onTap: () {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const ContactDetail()));
+      _showContactOptions(context, contact);
+    },
+    onLongPress: () {
+      _showContactOptions(context, contact);
     },
     child: Container(
       padding: const EdgeInsets.all(16),
@@ -201,4 +205,144 @@ Widget _avatar(String avatar) {
       image: DecorationImage(image: NetworkImage(avatar)),
     ),
   );
+}
+
+void _showContactOptions(BuildContext context, ContactModel contact) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (BuildContext context) {
+      return DraggableScrollableSheet(
+        initialChildSize: 0.4,
+        minChildSize: 0.2,
+        maxChildSize: 0.75,
+        expand: false,
+        builder: (_, controller) {
+          return SingleChildScrollView(
+            controller: controller,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Center(
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: NetworkImage(
+                              'https://th.bing.com/th/id/R.3ca27c4e03d21a9687d35546930bd036?rik=suSQLI%2fHOdZDjw&pid=ImgRaw&r=0'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: Text(
+                      contact.contact_name,
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _infoTile(Icons.phone, contact.contact_number),
+                  _infoTile(Icons.email, contact.contact_email),
+                  if (contact.contact_note.isNotEmpty)
+                    _infoTile(Icons.note, contact.contact_note),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _actionButton(Icons.call, 'Appeler', () async {
+                        final Uri launchUri = Uri(
+                          scheme: 'tel',
+                          path: contact.contact_number,
+                        );
+                        try {
+                          await launchUrl(launchUri,
+                              mode: LaunchMode.externalApplication);
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Impossible de lancer l'appel: $e"),
+                            ),
+                          );
+                        }
+                      }),
+                      _actionButton(Icons.message, 'Message', () async {
+                        await _sendMessage(context, contact.contact_number);
+                      }),
+                      _actionButton(Icons.edit, 'Modifier', () {
+                        Navigator.pop(context);
+                      }),
+                      _actionButton(Icons.delete, 'Supprimer', () {
+                        Navigator.pop(context);
+                      }),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+Widget _infoTile(IconData icon, String text) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: Row(
+      children: [
+        Icon(icon, color: textColorSecondary),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _actionButton(IconData icon, String label, VoidCallback onPressed) {
+  return ElevatedButton.icon(
+    icon: Icon(icon),
+    label: Text(label),
+    onPressed: onPressed,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: mainColor,
+      foregroundColor: bgColor,
+    ),
+  );
+}
+
+Future<void> _sendMessage(BuildContext context, String phoneNumber) async {
+  final Uri smsUri = Uri(
+    scheme: 'sms',
+    path: phoneNumber,
+  );
+  try {
+    if (await canLaunchUrl(smsUri)) {
+      await launchUrl(smsUri);
+    } else {
+      throw 'Could not launch $smsUri';
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Impossible d'ouvrir l'application de messagerie: $e"),
+      ),
+    );
+  }
 }
