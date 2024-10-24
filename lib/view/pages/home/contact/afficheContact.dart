@@ -142,81 +142,51 @@ class _AfficheContactState extends State<AfficheContact>
 }
 
 Widget _contactItem(BuildContext context, ContactModel contact) {
-  return InkWell(
-    onTap: () {
-      _showContactOptions(context, contact);
-    },
-    child: Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: textColorSecondary.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
+  return Card(
+    elevation: 2,
+    color: cardColor.withOpacity(0.4),
+    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: ListTile(
+      contentPadding: const EdgeInsets.all(16),
+      onTap: () => _showContactOptions(context, contact),
+      leading: const CircleAvatar(
+        radius: 30,
+        backgroundImage: NetworkImage(
+            'https://th.bing.com/th/id/R.3ca27c4e03d21a9687d35546930bd036?rik=suSQLI%2fHOdZDjw&pid=ImgRaw&r=0'),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      title: Text(
+        contact.contact_name,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _avatar(
-              'https://th.bing.com/th/id/R.3ca27c4e03d21a9687d35546930bd036?rik=suSQLI%2fHOdZDjw&pid=ImgRaw&r=0'),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  contact.contact_name,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  contact.contact_number,
-                  style:
-                      const TextStyle(fontSize: 14, color: textColorSecondary),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  contact.contact_email,
-                  style:
-                      const TextStyle(fontSize: 14, color: textColorSecondary),
-                ),
-                if (contact.contact_note.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    contact.contact_note,
-                    style: const TextStyle(
-                        fontSize: 12,
-                        color: textColorSecondary,
-                        fontStyle: FontStyle.italic),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ],
-            ),
+          const SizedBox(height: 4),
+          Text(
+            contact.contact_number,
+            style: const TextStyle(fontSize: 14, color: textColorSecondary),
           ),
-          const Icon(Icons.chevron_right, color: textColorSecondary),
+          Text(
+            contact.contact_email,
+            style: const TextStyle(fontSize: 14, color: textColorSecondary),
+          ),
+          if (contact.contact_note.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              contact.contact_note,
+              style: const TextStyle(
+                fontSize: 12,
+                color: textColorSecondary,
+                fontStyle: FontStyle.italic,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ],
       ),
-    ),
-  );
-}
-
-Widget _avatar(String avatar) {
-  return Container(
-    width: 60,
-    height: 60,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      image: DecorationImage(image: NetworkImage(avatar)),
+      trailing: const Icon(Icons.chevron_right, color: textColorSecondary),
     ),
   );
 }
@@ -283,6 +253,7 @@ void _showContactOptions(BuildContext context, ContactModel contact) {
                           await launchUrl(launchUri,
                               mode: LaunchMode.externalApplication);
                         } catch (e) {
+                          // ignore: use_build_context_synchronously
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text("Impossible de lancer l'appel: $e"),
@@ -353,6 +324,7 @@ Future<void> _sendMessage(BuildContext context, String phoneNumber) async {
       throw 'Could not launch $smsUri';
     }
   } catch (e) {
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Failed to open message: $e"),

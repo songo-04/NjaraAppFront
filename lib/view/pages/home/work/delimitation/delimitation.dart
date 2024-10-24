@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:convert';
 import 'package:appfront/constant/color.dart';
 import 'package:appfront/constant/link.dart';
@@ -433,8 +435,7 @@ class DelimitationListItem extends StatelessWidget {
 class DelimitationDetailsSheet extends StatefulWidget {
   final DelimitationModel delimitation;
 
-  const DelimitationDetailsSheet({Key? key, required this.delimitation})
-      : super(key: key);
+  const DelimitationDetailsSheet({super.key, required this.delimitation});
 
   @override
   _DelimitationDetailsSheetState createState() =>
@@ -478,10 +479,9 @@ class _DelimitationDetailsSheetState extends State<DelimitationDetailsSheet>
             minChildSize: 0.5,
             maxChildSize: 1.0,
             builder: (_, controller) => Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: cardColor,
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(20)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: Column(
                 children: [
@@ -557,7 +557,6 @@ class _DelimitationDetailsSheetState extends State<DelimitationDetailsSheet>
             'Dernière mise à jour',
             DateFormat('dd/MM/yyyy HH:mm')
                 .format(DateTime.parse(widget.delimitation.updatedAt))),
-        // Ajoutez d'autres détails ici selon votre modèle DelimitationModel
       ],
     );
   }

@@ -25,7 +25,7 @@ class _TaskHomePageState extends State<TaskHomePage> {
             right: MediaQuery.of(context).size.width * 0.1, // Moved to right
             child: buildBlurCircle(60, mainColor.withOpacity(0.6)),
           ),
-          Container(
+          const SizedBox(
             width: double.infinity,
             height: double.infinity,
             child:

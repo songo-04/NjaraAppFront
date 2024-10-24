@@ -1,3 +1,4 @@
+import 'package:appfront/utils/circle.dart';
 import 'package:flutter/material.dart';
 import 'afficheContact.dart';
 import 'createContactPage.dart';
@@ -17,28 +18,38 @@ class _ContactState extends State<Contact> {
       width: double.infinity,
       height: double.infinity,
       color: bgColor,
-      child: Column(
+      child: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            width: double.infinity,
-            height: 50,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ContactCreatePage()));
-                    },
-                    icon: const Icon(Icons.add, color: textColor))
-              ],
-            ),
+          Positioned(
+            top: MediaQuery.of(context).size.height * 0.2,
+            left: MediaQuery.of(context).size.width * 0.1,
+            child: buildBlurCircle(30, mainColor.withOpacity(0.6)),
           ),
-          const Expanded(
-            child: AfficheContact(),
+          Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                width: double.infinity,
+                height: 50,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ContactCreatePage()));
+                        },
+                        icon: const Icon(Icons.add, color: textColor))
+                  ],
+                ),
+              ),
+              const Expanded(
+                child: AfficheContact(),
+              ),
+            ],
           ),
         ],
       ),

@@ -10,25 +10,36 @@ class AppBarUtils extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(title, style: const TextStyle(color: bgColor)),
-      backgroundColor: mainColor,
+      title: Text(title, style: const TextStyle(color: textColor)),
+      backgroundColor: bgColor,
       elevation: 0,
       centerTitle: true,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: bgColor),
+        icon: const Icon(Icons.arrow_back_ios, color: textColor),
         onPressed: () => Navigator.of(context).pop(),
+        style: ButtonStyle(
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+              side: const BorderSide(color: textColorSecondary),
+            ),
+          ),
+          padding: WidgetStateProperty.all(
+            const EdgeInsets.only(left: 8),
+          ),
+        ),
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.info_outline, color: bgColor),
+          icon: const Icon(Icons.info_outline, color: textColor),
           onPressed: () {
             // Show info dialog or navigate to help page
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
                 title: const Text('Information'),
-                content: const Text(
-                    'Remplissez tous les champs pour ajouter un nouveau morcellement.'),
+                content: Text(
+                    'Remplissez tous les champs pour ajouter un nouveau $title'),
                 actions: [
                   TextButton(
                     child: const Text(

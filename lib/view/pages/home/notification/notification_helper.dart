@@ -63,7 +63,7 @@ class NotificationHelper {
 
   void _startDailyCheck() {
     final now = DateTime.now();
-    DateTime scheduledTime = DateTime(now.year, now.month, now.day, 13, 45);
+    DateTime scheduledTime = DateTime(now.year, now.month, now.day, 19, 00);
 
     if (now.isAfter(scheduledTime)) {
       scheduledTime = scheduledTime.add(const Duration(days: 1));

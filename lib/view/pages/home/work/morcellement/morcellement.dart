@@ -482,10 +482,10 @@ class _MorcellementDetailsSheetState extends State<MorcellementDetailsSheet>
             minChildSize: 0.5,
             maxChildSize: 1.0,
             builder: (_, controller) => Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: cardColor,
                 borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(20)),
+                     BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: Column(
                 children: [
