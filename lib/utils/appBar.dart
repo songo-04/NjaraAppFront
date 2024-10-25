@@ -33,7 +33,6 @@ class AppBarUtils extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon: const Icon(Icons.info_outline, color: textColor),
           onPressed: () {
-            // Show info dialog or navigate to help page
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
