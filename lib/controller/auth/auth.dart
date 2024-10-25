@@ -11,7 +11,7 @@ class Auth {
   final _storage = const FlutterSecureStorage();
   Future<http.Response> login(Map<String, String> body) async {
     var request = await http.post(
-      Uri.parse('${urlApi}user/signin'),
+      Uri.parse('${urlApi2}user/signin'),
       headers: {"Content-type": "application/json"},
       body: json.encode(body),
     );
@@ -20,7 +20,7 @@ class Auth {
 
   Future<dynamic> signup(Map<String, String> body) async {
     var request = await http.post(
-      Uri.parse('${urlApi}user/signup'),
+      Uri.parse('${urlApi2}user/signup'),
       headers: {"Content-type": "application/json"},
       body: json.encode(body),
     );
@@ -39,7 +39,7 @@ class Auth {
       Logger log = Logger();
       log.i(token.toString());
       var response = await http.get(
-        Uri.parse('${urlApi}user/checkuser'),
+        Uri.parse('${urlApi2}user/checkuser'),
         headers: {"authorization": token.toString()},
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -53,19 +53,3 @@ class Auth {
     }
   }
 }
-
-//  Future<dynamic> post(Map<String, String> body) async {
-//     String url = 'signup';
-//     var request = await http.post(
-//       Uri.parse(baseUrl + url),
-//       headers: {"Content-type": "application/json"},
-//       body: json.encode(body),
-//     );
-//     if (request.statusCode == 200 || request.statusCode == 201) {
-//       log.i(request.body);
-//       return request;
-//     }
-//     log.d(request.body);
-//     log.d(request.statusCode);
-//   }
-// }
