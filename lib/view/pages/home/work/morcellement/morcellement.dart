@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:appfront/constant/color.dart';
 import 'package:appfront/constant/link.dart';
+import 'package:appfront/controller/api/APIController.dart';
 import 'package:appfront/model/work/morcellement.dart';
 import 'package:appfront/utils/spinkit.dart';
 import 'package:appfront/utils/voirPlus.dart';
@@ -59,23 +60,15 @@ class _MorcellementState extends State<MorcellementPage> {
       _isLoading = true;
     });
     try {
-      final token = await storage.read(key: 'token');
-      final response = await http.get(
-        Uri.parse('${urlApi}work/morcellement'),
-        headers: {"Authorization": token ?? ''},
-      );
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        log.i(response.body);
-        final List<dynamic> datas = json.decode(response.body);
-        setState(() {
-          _morcellementList =
-              datas.map((data) => Morcellement.fromJson(data)).toList();
-          _loadMorcellement();
-          _isLoading = false;
-        });
-      } else {
-        throw Exception('Failed to load morcellement: ${response.statusCode}');
-      }
+      final response = await APIController().getAll('work/morcellement');
+      log.i(response.body);
+      final List<dynamic> datas = json.decode(response.body);
+      setState(() {
+        _morcellementList =
+            datas.map((data) => Morcellement.fromJson(data)).toList();
+        _loadMorcellement();
+        _isLoading = false;
+      });
     } catch (e) {
       log.e('Error fetching morcellement: $e');
       setState(() {

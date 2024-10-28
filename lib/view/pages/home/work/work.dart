@@ -1,5 +1,6 @@
 import 'package:appfront/constant/color.dart';
 import 'package:appfront/utils/circle.dart';
+import 'package:appfront/view/pages/home/work/travaux/travaux.dart';
 import 'package:flutter/material.dart';
 import 'delimitation/delimitation.dart';
 import 'morcellement/morcellement.dart';
@@ -25,10 +26,7 @@ class Work extends StatelessWidget {
         ),
         PageView(
           padEnds: false,
-          children: const [
-            MorcellementPage(),
-            Delimitation(),
-          ],
+          children: const [MorcellementPage(), Delimitation(), Travaux()],
         ),
       ]),
     );

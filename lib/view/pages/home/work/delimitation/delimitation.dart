@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:appfront/constant/color.dart';
 import 'package:appfront/constant/link.dart';
+import 'package:appfront/controller/api/APIController.dart';
 import 'package:appfront/model/work/delimitation.dart';
 import 'package:appfront/utils/spinkit.dart';
 import 'package:appfront/view/pages/home/work/delimitation/addDelimitation.dart';
@@ -58,23 +59,15 @@ class _DelimitationState extends State<Delimitation> {
       _isLoading = true;
     });
     try {
-      final token = await storage.read(key: 'token');
-      final response = await http.get(
-        Uri.parse('${urlApi}work/delimitation'),
-        headers: {"Authorization": token ?? ''},
-      );
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        log.i(response.body);
-        final List<dynamic> datas = json.decode(response.body);
-        setState(() {
-          _delimitationList =
-              datas.map((data) => DelimitationModel.fromJson(data)).toList();
-          _loadDelimitation();
-          _isLoading = false;
-        });
-      } else {
-        throw Exception('Failed to load delimitations: ${response.statusCode}');
-      }
+      final response = await APIController().getAll('work/delimitation');
+      log.i(response.body);
+      final List<dynamic> datas = json.decode(response.body);
+      setState(() {
+        _delimitationList =
+            datas.map((data) => DelimitationModel.fromJson(data)).toList();
+        _loadDelimitation();
+        _isLoading = false;
+      });
     } catch (e) {
       log.e('Error fetching delimitation: $e');
       setState(() {

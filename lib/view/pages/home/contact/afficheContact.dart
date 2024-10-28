@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'dart:convert';
+import 'package:appfront/controller/api/APIController.dart';
 import 'package:appfront/utils/spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -45,23 +46,15 @@ class _AfficheContactState extends State<AfficheContact>
       _isLoading = true;
     });
     try {
-      final token = await storage.read(key: 'token');
-      final response = await http.get(
-        Uri.parse('${urlApi}contact'),
-        headers: {"Authorization": token ?? ''},
-      );
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        log.i(response.body);
-        final List<dynamic> datas = json.decode(response.body);
-        setState(() {
-          _contactList =
-              datas.map((data) => ContactModel.fromJson(data)).toList();
-          _isLoading = false;
-          _dataFetched = true;
-        });
-      } else {
-        throw Exception('Failed to load contacts: ${response.statusCode}');
-      }
+      final response = await APIController().getAll('contact');
+      log.i(response.body);
+      final List<dynamic> datas = json.decode(response.body);
+      setState(() {
+        _contactList =
+            datas.map((data) => ContactModel.fromJson(data)).toList();
+        _isLoading = false;
+        _dataFetched = true;
+      });
     } catch (e) {
       log.e('Error fetching contacts: $e');
       setState(() {
