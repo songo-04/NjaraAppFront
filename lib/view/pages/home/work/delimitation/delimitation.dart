@@ -2,7 +2,6 @@
 
 import 'dart:convert';
 import 'package:appfront/constant/color.dart';
-import 'package:appfront/constant/link.dart';
 import 'package:appfront/controller/api/APIController.dart';
 import 'package:appfront/model/work/delimitation.dart';
 import 'package:appfront/utils/spinkit.dart';
@@ -11,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
-import 'package:http/http.dart' as http;
 import 'package:table_calendar/table_calendar.dart';
 import 'package:appfront/utils/voirPlus.dart';
 

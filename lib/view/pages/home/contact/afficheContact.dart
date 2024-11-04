@@ -6,8 +6,6 @@ import 'package:appfront/utils/spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
-import 'package:appfront/constant/link.dart';
 import 'package:appfront/model/contact/contact.dart';
 import 'package:appfront/view/pages/home/contact/createContactPage.dart';
 import 'package:appfront/constant/color.dart';
