@@ -5,8 +5,6 @@ import 'package:logger/logger.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class Auth {
-  String baseUrl = 'http://127.0.0.1:8080/njarapi/user/';
-
   Logger log = Logger();
   final _storage = const FlutterSecureStorage();
   Future<http.Response> login(Map<String, String> body) async {

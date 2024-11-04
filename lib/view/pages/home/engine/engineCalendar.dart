@@ -21,7 +21,7 @@ class _EngineCalendarPageState extends State<EngineCalendarPage> {
   late DateTime _lastDay;
   late DateTime _selectedDay;
 
-  Map<DateTime, List<EngineReservation>> _events = {};
+  final Map<DateTime, List<EngineReservation>> _events = {};
   final TextEditingController _eventController = TextEditingController();
 
   List<EngineReservation> _getEventsForDay(DateTime day) {
@@ -36,7 +36,12 @@ class _EngineCalendarPageState extends State<EngineCalendarPage> {
 
     if (eventTitle.isEmpty) return;
 
-    final newEvent = EngineReservation(reservation_name: eventTitle);
+    final newEvent = EngineReservation(
+      engine: '',
+      date: _selectedDay,
+      notify: '',
+      desc: '',
+    );
     setState(() {
       if (_events[_selectedDay] != null) {
         _events[_selectedDay]!.add(newEvent);
@@ -57,14 +62,6 @@ class _EngineCalendarPageState extends State<EngineCalendarPage> {
     _focusedDay = DateTime.now();
     _firstDay = DateTime.now().subtract(const Duration(days: 1000));
     _lastDay = DateTime.now().add(const Duration(days: 1000));
-    _events = {
-      DateTime.utc(2024, 9, 9): [
-        const EngineReservation(reservation_name: 'reservation appareil 1')
-      ],
-      DateTime.utc(2024, 9, 10): [
-        const EngineReservation(reservation_name: 'reservation appareil 2')
-      ],
-    };
   }
 
   @override
@@ -114,7 +111,7 @@ class _EngineCalendarPageState extends State<EngineCalendarPage> {
           child: ListView(
             children: _getEventsForDay(_selectedDay)
                 .map((event) => ListTile(
-                      title: Text(event.reservation_name),
+                      title: Text(event.notify),
                     ))
                 .toList(),
           ),

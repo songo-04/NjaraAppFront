@@ -1,4 +1,5 @@
-// ignore: file_names
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:appfront/controller/api/APIController.dart';
 import 'package:flutter/material.dart';
 import 'package:appfront/utils/showSheetModal.dart';
@@ -45,8 +46,8 @@ class _State extends State<ReservationEngine> {
 
   Future<dynamic> _getListEngine() async {
     try {
-      final response = await APIController().getAll('/engine');
-      logger.i(response.data);
+      final response = await APIController().getAll('engine');
+      logger.i(response.body);
     } catch (e) {
       logger.e(e);
     }

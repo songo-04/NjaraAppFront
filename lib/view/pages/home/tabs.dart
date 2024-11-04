@@ -64,14 +64,6 @@ class _TabsState extends State<Tabs> {
                 );
               },
             ),
-            title: const Text(
-              'AppName',
-              style: TextStyle(
-                color: textColor,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
             actions: [
               IconButton(
                 icon: const Icon(Icons.notifications_outlined,
@@ -97,8 +89,9 @@ class _TabsState extends State<Tabs> {
 
   Widget _buildBottomNavigationBar() {
     return Container(
-      decoration: const BoxDecoration(
-        color: bgColor,
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(14),
       ),
       child: SafeArea(
         child: Padding(

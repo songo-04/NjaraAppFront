@@ -56,7 +56,10 @@ class _DashboardState extends State<Dashboard> {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: color,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(10),
+      ),
     );
   }
 
