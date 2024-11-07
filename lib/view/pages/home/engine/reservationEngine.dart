@@ -1,6 +1,9 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'dart:convert';
+
 import 'package:appfront/controller/api/APIController.dart';
+import 'package:appfront/model/engine/engineReservation.dart';
 import 'package:flutter/material.dart';
 import 'package:appfront/utils/showSheetModal.dart';
 import 'package:logger/logger.dart';
@@ -20,6 +23,7 @@ class _State extends State<ReservationEngine> {
   Logger logger = Logger();
   String groupValue = '';
   List<dynamic> listEngine = [];
+  List<String> name_engine = [];
   final TextEditingController _engineNameController = TextEditingController();
 
   @override
@@ -37,7 +41,10 @@ class _State extends State<ReservationEngine> {
           children: [
             _listEngine(),
             _buildTextField(
-                "Engine Name", "Enter engine name", _engineNameController),
+              "Engine Name",
+              "Enter engine name",
+              _engineNameController,
+            ),
           ],
         ),
       ),
@@ -48,18 +55,19 @@ class _State extends State<ReservationEngine> {
     try {
       final response = await APIController().getAll('engine');
       logger.i(response.body);
+      final List<dynamic> datas = json.decode(response.body);
+      setState(() {
+        listEngine = datas.map((data) => Engine.fromJson(data)).toList();
+        name_engine = listEngine.map<String>((x) => x.engine_name).toList();
+      });
     } catch (e) {
       logger.e(e);
     }
   }
 
   Widget _listEngine() {
-    // Define the list of engine options
-    final List<String> engineOptions = ['Engine 1', 'Engine 2', 'Engine 3'];
-
-    // Set initial value if groupValue is empty
     if (groupValue.isEmpty) {
-      groupValue = engineOptions[0];
+      groupValue = name_engine.isNotEmpty ? name_engine[0] : 'Loading...';
     }
 
     return DropdownButton<String>(
@@ -69,7 +77,7 @@ class _State extends State<ReservationEngine> {
           groupValue = newValue!;
         });
       },
-      items: engineOptions.map<DropdownMenuItem<String>>((String value) {
+      items: name_engine.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(value: value, child: Text(value));
       }).toList(),
     );
