@@ -19,6 +19,7 @@ class ReservationEngine extends StatefulWidget {
 }
 
 class _State extends State<ReservationEngine> {
+  bool isEngineLoading = false;
   Logger logger = Logger();
   String groupValue = '';
   List<dynamic> listEngine = [];
@@ -58,7 +59,9 @@ class _State extends State<ReservationEngine> {
       setState(() {
         listEngine = datas.map((data) => Engine.fromJson(data)).toList();
         name_engine = listEngine.map<String>((x) => x.engine_name).toList();
+        isEngineLoading = true;
       });
+      logger.i(name_engine);
     } catch (e) {
       logger.e(e);
     }
@@ -66,11 +69,12 @@ class _State extends State<ReservationEngine> {
 
   Widget _listEngine() {
     if (groupValue.isEmpty) {
-      groupValue = name_engine.isNotEmpty ? name_engine[0] : 'Loading...';
+      // Ensure groupValue is set only if name_engine is not empty
+      groupValue = name_engine.isNotEmpty ? name_engine[0] : '';
     }
 
     return DropdownButton<String>(
-      value: groupValue,
+      value: groupValue.isNotEmpty ? groupValue : null, // Set to null if empty
       onChanged: (String? newValue) {
         setState(() {
           groupValue = newValue!;
